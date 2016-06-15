@@ -106,6 +106,8 @@ class Hardware6(EventEmitter):
         if isinstance(txt, tuple):
             mode = txt[1]
             txt = txt[0]
+        if not txt:
+            txt = ' '
         txt = txt.split('/')
         cmd = 'texttitreur'
         cmd += ' -line1 ' + txt[0].replace(' ', '_')

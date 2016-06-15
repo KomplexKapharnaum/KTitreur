@@ -17,7 +17,6 @@ class Udpinterface(EventEmitter):
         try:
             data, address = self.sock.recvfrom(4096)
             data = data.decode('utf-8').strip().split(' ')
-            print ("REceived", data, "from", address)
 
             # speed TIMEMIN [TIMEMAX]
             if data[0] == "auto":
