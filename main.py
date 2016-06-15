@@ -1,4 +1,4 @@
-import signal
+import signal, sys
 from hardware6 import Hardware6
 from textlist import Textlist
 from udpinterface import Udpinterface
@@ -20,7 +20,10 @@ texts = Textlist()
 texts.on('pick', hw.text)
 
 # RAW UDP
-udp = Udpinterface(3742)
+UDP_PORT = 3742
+if len(sys.argv) >= 2:
+    UDP_PORT = int(sys.argv[1])
+udp = Udpinterface(UDP_PORT)
 udp.on('auto',      texts.autoPick )
 udp.on('scroll',    hw.scroll)
 udp.on('clear',     texts.clear)

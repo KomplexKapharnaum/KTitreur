@@ -8,7 +8,9 @@ class Hardware6(EventEmitter):
     # Init titreur object
     def __init__(self, binarypath):
         super().__init__()
-        self.binarypath = binarypath
+
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        self.binarypath =  os.path.join(my_path, binarypath)
         self.running = False
         self.log = logging.getLogger('hardware process')
 
