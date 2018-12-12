@@ -15,6 +15,8 @@ class Textlist(EventEmitter):
 
     # PICK FROM LIST (avoid last item)
     def pick(self):
+        self.timer.cancel()
+
         item = None
         if len(self.texts) == 1:
             item = self.texts[0]
@@ -27,7 +29,6 @@ class Textlist(EventEmitter):
         self.last = item
         self.emit('pick', item)
 
-        self.timer.cancel()
         if self.minInterval > 0:
             next = random.randint(self.minInterval,self.maxInterval)/1000.0
             self.timer = Timer(next, self.pick)
@@ -37,8 +38,10 @@ class Textlist(EventEmitter):
 
 
     # Clear list
-    def clear(self):
+    def clear(self, now=True):
         self.texts = []
+        if now:
+            self.pick()
 
 
     # Add to list // item should be a tuple (text, scroll_mode)
@@ -52,7 +55,7 @@ class Textlist(EventEmitter):
     def set(self, lst):
         if not isinstance(lst, list):
             lst = [lst]
-        self.clear()
+        self.clear(False)
         for item in lst:
             self.add(item)
         self.pick()
