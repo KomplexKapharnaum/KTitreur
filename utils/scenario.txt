@@ -1,24 +1,32 @@
 #ip 2.0.255.255
-#port 3742
+auto 100
 
 clear
-add NO_SCROLL_NORMAL      petit texte /     statique
-add SCROLL_NORMAL      petit texte /     scroll
-add SCROLL_LOOP_NORMAL         petit texte /    scroll loop
-add NO_SCROLL_BIG  gros text statique
-add SCROLL_BIG      gros text scroll
-
-speed 1000 2000   # interval de changement de text en millisecondes
-scrollspeed 70    # vitesse de défilement du scroll (plus petit = plus rapide)
-
-tick
-
-#wait 5000
-
 clear
-add SCROLL_BIG  BEAUCOUP
-add SCROLL_BIG  un peu
 
-#wait 5000
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG  _
+add NO_SCROLL_BIG  =)àç_è-('"é"')
 
-text SCROLL_BIG    DONE!
+#ip 2.0.11.45
+auto 10
+clear
+add NO_SCROLL_BIG   AMOUR
+add NO_SCROLL_BIG   AMOUR
+add NO_SCROLL_BIG   AMOUR
+add NO_SCROLL_BIG  _
+add NO_SCROLL_BIG  =)àç_è-('"é"')
+
+#quit
+
+auto 0
+clear
+scroll 10
+text SCROLL_LOOP_NORMAL          beaucoup                    beaucoup                    beaucoup                   beaucoup /                   beaucoup                   beaucoup                  beaucoup                  beaucoup
+
+#quit

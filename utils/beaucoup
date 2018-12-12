@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import curses
+import os.path
+
+def play_scenario(num, win):
+    path = 'scenario-'+str(num)+'.txt'
+
+    win.clear()
+    win.addstr("BEAUCOUP scenario: ")
+    win.addstr(str(num))
+
+    if not os.path.exists(path):
+        win.addstr("\n ERROR: File "+path+" not found")
+        return False
+
+    with open(path) as f:
+        content = f.readlines()
+    content = [x.strip() for x in content]   # remove \n
+
+
+def main(win):
+
+    win.nodelay(False)
+    win.clear()
+    win.addstr("BEAUCOUP scenario: ")
+    while 1:
+        try:
+            key = win.getkey()
+
+            if key == 'q':
+                break
+
+            # 0 - 9
+            elif ord(key) >= 48 and ord(key) <= 57:
+                play_scenario(ord(key)-48, win)
+
+
+        except Exception as e:
+           # No input
+           pass
+
+curses.wrapper(main)
