@@ -5,28 +5,29 @@ class Udpinterface(EventEmitter):
 
     # Init object
     def __init__(self, port):
+        super().__init__()
         self.sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
         self.sock.bind(("0.0.0.0", port))
         self.sock.settimeout(0.1)
-        print("Receiveing UDP on", port)
+        print("UDP listening on", port)
 
     # Read UDP input
     def check(self):
         try:
             data, address = self.sock.recvfrom(4096)
-            data = data.strip().split(' ')
+            data = data.decode('utf-8').strip().split(' ')
             print ("REceived", data, "from", address)
 
             # speed TIMEMIN [TIMEMAX]
-            if data[0] == "intervals":
+            if data[0] == "auto":
             	if len(data) >= 3 and data[2] != "#":
             		SPEEDMIN = int(data[1])
             		SPEEDMAX = int(data[2])
             	elif len(data) >= 2:
             		SPEEDMIN = int(data[1])
             		SPEEDMAX = int(data[1])
-            	self.emit('intervals', (SPEEDMIN, SPEEDMAX))
+            	self.emit('auto', (SPEEDMIN, SPEEDMAX))
 
             # scrool speed
             elif data[0] == "scroll":

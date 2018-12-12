@@ -1,41 +1,46 @@
 import signal
-from threading import Lock
 from hardware6 import Hardware6
 from textlist import Textlist
 from udpinterface import Udpinterface
 
 # RUN
-DONE = Lock()
-DONE.acquire()
+RUN = True
 
 def signal_handler(signal, frame):
-    global DONE
-    DONE.release()
+    global RUN
+    RUN = False
 signal.signal(signal.SIGINT, signal_handler)
 
 # HARDWARE
 hw = Hardware6('bin/hardware6')
-if not hw.start():
-    DONE.release()
-    print("Error when starting titreur. Exiting.")
+RUN = hw.start()
 
 # TEXTLIST
 texts = Textlist()
-texts.on('pick', lambda item: hw.text(item[0],item[1]) )
-texts.add("hello")
-texts.add("world")
-texts.autoPick(100)
-
+texts.on('pick', hw.text)
 
 # RAW UDP
 udp = Udpinterface(3742)
-udp.on('intervals', lambda inter: texts.autoPick(inter[0],inter[1]) )
+udp.on('auto',      texts.autoPick )
 udp.on('scroll',    hw.scroll)
-udp.on('clear',     hw.clear)
-udp.on('add',       hw.add)
+udp.on('clear',     texts.clear)
+udp.on('add',       texts.add)
 udp.on('text',      texts.set)
-udp.on('tick',      hw.tick)
+udp.on('tick',      texts.pick)
+
+# OSC
+
+
+# DEFAULT BEHAVIOUR
+texts.add( (" beaucoup / beaucoup", 'NO_SCROLL_NORMAL') )
+texts.add( ("beaucoup beaucoup", 'NO_SCROLL_BIG') )
+texts.add( ("           beaucoup /     beaucoup", 'SCROLL_LOOP_NORMAL') )
+texts.add( ("    beaucoup beaucoup", 'SCROLL_LOOP_BIG') )
+texts.autoPick(2000)
+
+# LOOP
+while RUN:
+    udp.check()
 
 # EXIT
-with DONE:
-    hw.stop()
+hw.stop()

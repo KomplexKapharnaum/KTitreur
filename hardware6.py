@@ -1,11 +1,13 @@
 import logging
 from subprocess import Popen, PIPE, STDOUT
 import fcntl, os
+from pyee import EventEmitter
 
-class Hardware6:
+class Hardware6(EventEmitter):
 
     # Init titreur object
     def __init__(self, binarypath):
+        super().__init__()
         self.binarypath = binarypath
         self.running = False
         self.log = logging.getLogger('hardware process')
@@ -20,7 +22,7 @@ class Hardware6:
         self.MODES['SCROLL_VERTICAL_LOOP_NORMAL'] = 12	# broken
         self.MODES['NO_SCROLL_BIG'] = 100
         self.MODES['SCROLL_BIG'] = 101
-        self.MODES['SCROLL_LOOP_BIG'] = 102				# broken
+        self.MODES['SCROLL_LOOP_BIG'] = 102
         self.MODES['SCROLL_VERTICAL_BIG'] = 111			# broken
         self.MODES['SCROLL_VERTICAL_LOOP_BIG'] = 112	# broken
 
@@ -99,6 +101,9 @@ class Hardware6:
 
     # Display text on Titreur
     def text(self, txt, mode=None):
+        if isinstance(txt, tuple):
+            mode = txt[1]
+            txt = txt[0]
         txt = txt.split('/')
         cmd = 'texttitreur'
         cmd += ' -line1 ' + txt[0].replace(' ', '_')

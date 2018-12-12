@@ -6,9 +6,12 @@ class Textlist(EventEmitter):
 
     # Init object
     def __init__(self):
+        super().__init__()
         self.texts = []
         self.last = None
         self.timer = Timer(0, self.pick)
+        self.minInterval = 0
+        self.maxInterval = 0
 
     # PICK FROM LIST (avoid last item)
     def pick(self):
@@ -52,10 +55,14 @@ class Textlist(EventEmitter):
         self.clear()
         for item in lst:
             self.add(item)
+        self.pick()
 
 
     # Auto pick
     def autoPick(self, minInterval, maxInterval=None):
+        if isinstance(minInterval, tuple):
+            maxInterval = minInterval[1]
+            minInterval = minInterval[0]
         if not maxInterval:
             maxInterval = minInterval
         self.minInterval = int(minInterval)
