@@ -1,0 +1,5 @@
+#to all
+clear
+clear
+#wait 5
+#loop

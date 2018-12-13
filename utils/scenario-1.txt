@@ -1,0 +1,5 @@
+#to all
+clear
+speed 0
+scroll 10
+text SCROLL_LOOP_NORMAL                         beaucoup                    beaucoup /                                  beaucoup                   beaucoup

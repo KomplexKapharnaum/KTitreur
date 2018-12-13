@@ -19,14 +19,14 @@ class Udpinterface(EventEmitter):
             data = data.decode('utf-8').strip().split(' ')
 
             # speed TIMEMIN [TIMEMAX]
-            if data[0] == "auto":
+            if data[0] == "speed":
             	if len(data) >= 3 and data[2] != "#":
             		SPEEDMIN = int(data[1])
             		SPEEDMAX = int(data[2])
             	elif len(data) >= 2:
             		SPEEDMIN = int(data[1])
             		SPEEDMAX = int(data[1])
-            	self.emit('auto', (SPEEDMIN, SPEEDMAX))
+            	self.emit('speed', (SPEEDMIN, SPEEDMAX))
 
             # scrool speed
             elif data[0] == "scroll":

@@ -24,7 +24,7 @@ UDP_PORT = 3742
 if len(sys.argv) >= 2:
     UDP_PORT = int(sys.argv[1])
 udp = Udpinterface(UDP_PORT)
-udp.on('auto',      texts.autoPick )
+udp.on('speed',     texts.autoPick )
 udp.on('scroll',    hw.scroll)
 udp.on('clear',     texts.clear)
 udp.on('add',       texts.add)

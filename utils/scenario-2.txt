@@ -1,0 +1,7 @@
+#to all
+clear
+speed 435
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG  _
+
+#quit

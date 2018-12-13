@@ -1,0 +1,22 @@
+#to all
+clear
+speed 100
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG  _
+add NO_SCROLL_BIG  =beç_è-('"
+
+#to 45
+clear
+speed 10
+add NO_SCROLL_BIG   AMOUR
+add NO_SCROLL_BIG   AMOUR
+add NO_SCROLL_BIG   AMOUR
+add NO_SCROLL_BIG  _
+add NO_SCROLL_BIG  = mç-$-
+
+#quit

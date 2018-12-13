@@ -2,13 +2,40 @@
 
 import curses
 import os.path
+import threading
+import time
+import socket
 
-def play_scenario(num, win):
+BROADCAST = IP = '2.0.255.255'
+PORT = 3742
+EVENT = threading.Event()
+
+class FuncThread(threading.Thread):
+    def __init__(self, target, window):
+        threading.Thread.__init__(self)
+        self._target = target
+        self._window = window
+        self._scene = 0
+
+    def scene(self, num):
+        self._scene = num
+
+    def run(self):
+        self._target(self._window, self._scene)
+
+    def stop(self):
+        if self.isAlive():
+            global EVENT
+            EVENT.set()
+            self.join()
+        EVENT.clear()
+
+
+def play_scenario(win, num):
     path = 'scenario-'+str(num)+'.txt'
 
     win.clear()
-    win.addstr("BEAUCOUP scenario: ")
-    win.addstr(str(num))
+    win.addstr("\n BEAUCOUP scenario: "+str(num)+" \n", curses.A_STANDOUT)
 
     if not os.path.exists(path):
         win.addstr("\n ERROR: File "+path+" not found")
@@ -19,25 +46,141 @@ def play_scenario(num, win):
     content = [x.strip() for x in content]   # remove \n
 
 
+    win.addstr("\n Playing "+path+"\n")
+    while execute_content(win, content):
+        pass
+
+    global EVENT
+    if EVENT.is_set():
+        win.addstr("\n\n Stopped.")
+        return False
+
+    win.addstr("\n\n Done.")
+    return True
+
+
+def execute_content(win, content):
+    global BROADCAST, IP, PORT, EVENT
+
+    for line in content:
+        if EVENT.is_set():
+            return False
+
+        line = line.strip()
+
+        # PARSING META
+        if line.startswith('#'):
+            data = line.split(' ')
+
+            if data[0] == "#ip":
+                if len(data) > 1:
+                    IP = data[1:]
+                    win.addstr("\n #ip: "+str(IP))
+            elif data[0] == "#to":
+                if len(data) > 1:
+                    IP = []
+                    for to in data[1:]:
+                        if to == 'all':
+                            IP.append(BROADCAST)
+                        else:
+                            IP.append('2.0.11.'+str(int(to)))
+                    win.addstr("\n #to: "+str(IP))
+            elif data[0] == "#port":
+                if len(data) > 1:
+                    PORT = int(data[1])
+                    win.addstr("\n #port: "+str(PORT))
+            elif data[0] == "#waitms":
+                if len(data) > 1:
+                    win.addstr("\n #wait for: "+str(int(data[1])/1000.0)+"s")
+                    EVENT.wait(timeout=int(data[1])/1000.0)
+            elif data[0] == "#wait":
+                if len(data) > 1:
+                    win.addstr("\n #wait for: "+str(float(data[1]))+"s")
+                    EVENT.wait(timeout=float(data[1]))
+            elif data[0] == "#quit":
+                win.addstr("\n #quit")
+                return False
+            elif data[0] == "#loop":
+                win.addstr("\n #loop")
+                return True
+
+        # SENDING COMMANDS
+        elif line != '':
+            for ip in IP:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                if ip.endswith('255'):
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                    sock.sendto(line.encode('utf-8'), (ip, PORT))
+            # time.sleep(0.1)
+            win.addstr("\n sent: "+line)
+
+
 def main(win):
-
-    win.nodelay(False)
+    scenarioThread = FuncThread(play_scenario, win)
+    win.nodelay(True)
     win.clear()
-    win.addstr("BEAUCOUP scenario: ")
+    win.addstr("\n BEAUCOUP BEAUCOUP \n", curses.A_STANDOUT)
+    win.addstr("  press 0-9 for scenario / h for help / s to stop / q to quit ")
+    curses.resizeterm(50,100)
     while 1:
-        try:
-            key = win.getkey()
+        # try:
+            key = win.getch()
 
-            if key == 'q':
+            if key == ord('q'):
                 break
 
+            if key == ord('s'):
+                scenarioThread.stop()
+
+            if key == ord('h'):
+                win.clear()
+                win.addstr("\n BEAUCOUP help: \n", curses.A_STANDOUT)
+                win.addstr("\n   Destination: \n", curses.A_BOLD)
+                win.addstr("      #to all            = broadcast \n")
+                win.addstr("      #to 45 53 54       = send to titreur 45, 53 and 54 \n")
+                win.addstr("      #ip 2.0.11.50      = send to 2.0.11.50 \n")
+                win.addstr("      #port 3742         = change port (default 3742) \n")
+
+                win.addstr("\n   Scenario: \n", curses.A_BOLD)
+                win.addstr("      #wait 1.5          = pause for 1.5 s \n")
+                win.addstr("      #waitms 1000       = pause for 1000 ms \n")
+                win.addstr("      #loop              = restart from beggining \n")
+                win.addstr("      #quit              = exit scenario \n")
+
+                win.addstr("\n   Display text: \n", curses.A_BOLD)
+                win.addstr("      text MODE blablba       = display \"blablba\" using MODE \n")
+                win.addstr("      text MODE line1/line2   = display \"line1\" and \"line2\" using MODE \n")
+                win.addstr("         Available Modes:\n")
+                win.addstr("           NO_SCROLL_NORMAL\n")
+                win.addstr("           SCROLL_NORMAL\n")
+                win.addstr("           SCROLL_LOOP_NORMAL\n")
+                win.addstr("           NO_SCROLL_BIG\n")
+                win.addstr("           SCROLL_BIG\n")
+                win.addstr("           SCROLL_LOOP_BIG\n")
+
+                win.addstr("\n   Random playlist: \n", curses.A_BOLD)
+                win.addstr("      clear              = empty playlist \n")
+                win.addstr("      add MODE blabla    = add \"blabla\" with MODE to playlist \n")
+                win.addstr("      speed 1000         = playlist next item in ms \n")
+                win.addstr("      speed 1000 2000    = playlist next item in ms, random \n")
+
+                win.addstr("\n   Misc: \n", curses.A_BOLD)
+                win.addstr("      scroll 50          = scroll speed \n")
+
+
             # 0 - 9
-            elif ord(key) >= 48 and ord(key) <= 57:
-                play_scenario(ord(key)-48, win)
+            elif key >= 48 and key <= 57:
+                scenarioThread.stop()
+                scenarioThread = FuncThread(play_scenario, win)
+                scenarioThread.scene(key-48)
+                scenarioThread.start()
+
+            else:
+                time.sleep(0.1)
 
 
-        except Exception as e:
-           # No input
-           pass
+        # except Exception as e:
+        #    # No input
+        #    pass
 
 curses.wrapper(main)
