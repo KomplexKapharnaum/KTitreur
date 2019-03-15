@@ -1,0 +1,16 @@
+#SYMBOLS
+
+#to 44 45 48 50 51 52
+clear
+speed 0
+text NO_SCROLL_BIG ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ
+
+
+#quit
+
+#to all
+clear
+speed 400
+add NO_SCROLL_BIG Ñ ~ Ý å ì òó
+#add NO_SCROLL_BIG Ó Õ Þ æ í òõ
+#add NO_SCROLL_BIG ~`|ÍÕ

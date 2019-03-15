@@ -1,0 +1,71 @@
+#to 44 45 48 50 51 52
+clear
+speed 50
+
+text NOSCROLL_NORMAL vidéo          /        Julien Penichost
+
+#wait 1
+clear
+#wait 0.5
+
+text NOSCROLL_NORMAL 1er assistant  /          Origan Fossard
+
+#wait 1
+clear
+#wait 0.5
+
+text NOSCROLL_NORMAL machino        /           Nicolas Thiry
+
+#wait 1
+clear
+#wait 0.5
+
+text NOSCROLL_NORMAL photo          /      Michel Vendittelli
+
+#wait 1
+clear
+#wait 0.5
+
+text NOSCROLL_NORMAL son live       /                   Trash
+
+#wait 1
+clear
+#wait 0.5
+
+text NOSCROLL_NORMAL mc             /           MC Barriquand
+
+#wait 1
+clear
+#wait 0.5
+
+text NOSCROLL_NORMAL titreur        /               Maigre 37
+
+#wait 1
+clear
+#wait 0.5
+
+text NOSCROLL_NORMAL accueil        /               KXKM crew
+
+#wait 1
+clear
+#clearscreen
+#wait 0.5
+
+text NOSCROLL_NORMAL musique        /       Beaucoup Beaucoup
+
+#wait 1
+clear
+#wait 0.5
+
+speed 0
+scroll 18
+text SCROLL_NORMAL               thanks      /                 les figurant.e.s
+
+#wait 10
+clear
+#wait 0.5
+
+#loop
+
+
+/////////////////

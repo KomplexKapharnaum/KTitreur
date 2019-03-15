@@ -1,22 +1,30 @@
-#to all
-clear
-speed 100
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG  _
-add NO_SCROLL_BIG  =beç_è-('"
+#to 44 45 48 50 51 52
+scroll 10
+speed 0
+
+#to 44
+scroll 10
+text SCROLL_LOOP_NORMAL                             beaucoup                           BEAUCOUP       /                                              beaucoup                                 beaucoup
 
 #to 45
-clear
-speed 10
-add NO_SCROLL_BIG   AMOUR
-add NO_SCROLL_BIG   AMOUR
-add NO_SCROLL_BIG   AMOUR
-add NO_SCROLL_BIG  _
-add NO_SCROLL_BIG  = mç-$-
+scroll 25
+text SCROLL_LOOP_NORMAL                     beaucoup                                      beaucoup       /                           BEAUCOUP                 beaucoup
 
-#quit
+#to 48
+scroll 20
+text SCROLL_LOOP_NORMAL                             beaucoup                       beaucoup       /                                                      beaucoup                                 beaucoup
+
+#to 50
+scroll 25
+text SCROLL_LOOP_NORMAL              beaucoup                              beaucoup       /                                     beaucoup                                 beaucoup
+
+#to 51
+scroll 5
+text SCROLL_LOOP_NORMAL                                   beaucoup                                     beaucoup       /                           BEAUCOUP                 beaucoup
+
+#to 52
+scroll 10
+text SCROLL_LOOP_NORMAL                         beaucoup                           BEAUCOUP       /                                        beaucoup                                 beaucoup
+
+#wait 11
+#loop

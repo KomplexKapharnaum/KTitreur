@@ -1,7 +1,26 @@
-#to all
+#to 44 45 48 50 51 52
 clear
-speed 435
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG  _
+speed 100
+add NO_SCROLL_BIG   FEEL
+add NO_SCROLL_BIG      FEEL
+add NO_SCROLL_BIG     FEEL
+add NO_SCROLL_BIG    FEEL
+add NO_SCROLL_BIG  FEEL
+add NO_SCROLL_BIG   FEEL
+#add NO_SCROLL_BIG  _
 
-#quit
+#waitms 970
+
+#to 44 45 48 50 51 52
+clear
+speed 100
+add NO_SCROLL_BIG THE PARTY
+add NO_SCROLL_BIG  THE PARTY
+add NO_SCROLL_BIG    THE PARTY
+add NO_SCROLL_BIG THE PARTY
+add NO_SCROLL_BIG   THE PARTY
+add NO_SCROLL_BIG  THE PARTY
+#add NO_SCROLL_BIG  _
+
+#waitms 970
+#loop

@@ -1,0 +1,34 @@
+#to 44 45 48 50 51 52
+clear
+speed 10
+add NO_SCROLL_BIG   BEAUCOUP Þ
+add NO_SCROLL_BIG Þ BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   be-J_o-p
+
+#wait 2
+
+clear
+speed 10
+add NO_SCROLL_BIG    AMOUR
+add NO_SCROLL_BIG  _
+add NO_SCROLL_BIG   = mç-$-
+
+#wait 2
+
+clear
+speed 10
+add NO_SCROLL_BIG å BEAUCOUP
+add NO_SCROLL_BIG   BEAUCOUP å
+add NO_SCROLL_BIG   be-J_o-p
+
+#wait 2
+
+clear
+speed 50
+add NO_SCROLL_BIG  MUCHO
+add NO_SCROLL_BIG       CALOR
+add NO_SCROLL_BIG  _
+
+#wait 2
+#loop

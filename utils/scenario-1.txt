@@ -1,5 +1,33 @@
-#to all
-clear
+#to 44 45 48
 speed 0
-scroll 10
-text SCROLL_LOOP_NORMAL                         beaucoup                    beaucoup /                                  beaucoup                   beaucoup
+text NO_SCROLL_BIG   BEAUCOUP
+add NO_SCROLL_BIG   ÍÍÍÍÍÍÍÍ
+
+#wait 0.3 3
+
+#to 45
+speed 20
+
+#waitms 40
+speed 0
+text NO_SCROLL_BIG   BEAUCOUP
+
+#wait 0.3 2
+
+#to 44
+speed 20
+
+#waitms 40
+speed 0
+text NO_SCROLL_BIG   BEAUCOUP
+
+#wait 0.8 3
+
+#to 48
+speed 20
+
+#waitms 40
+speed 0
+text NO_SCROLL_BIG   BEAUCOUP
+
+#loop
