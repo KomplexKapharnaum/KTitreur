@@ -50,6 +50,7 @@ def play_scenario(win, num):
     while execute_content(win, content):
         win.clear()
         win.addstr("\n BEAUCOUP scenario: "+str(num)+" \n", curses.A_STANDOUT)
+        win.addstr("   ESC to exit\n")
 
     global EVENT
     if EVENT.is_set():
@@ -125,73 +126,147 @@ def execute_content(win, content):
 def main(win):
     scenarioThread = FuncThread(play_scenario, win)
     win.nodelay(True)
-    win.clear()
-    win.addstr("\n BEAUCOUP BEAUCOUP \n", curses.A_STANDOUT)
-    win.addstr("  press 0-9 for scenario / h for help / s to stop / q to quit ")
     curses.resizeterm(50,100)
+    page = 'home'
+    currentPage = ''
+
     while 1:
         # try:
             key = win.getch()
 
-            if key == ord('q'):
-                scenarioThread.stop()
-                break
+            if page != currentPage:
+                currentPage = page
 
-            if key == ord('s'):
-                scenarioThread.stop()
+                # CLEAR ALL
+                cmd = "clear"
+                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                sock.sendto(cmd.encode('utf-8'), (BROADCAST, PORT))
 
-            if key == ord('h'):
+                if page == 'home':
+                    win.clear()
+                    win.addstr("\n BEAUCOUP BEAUCOUP \n", curses.A_STANDOUT)
+                    win.addstr("  press 0-9 for scenario / m for freetext / h for help / q to quit ")
+
+            #
+            # HOME
+            #
+            if page == 'home':
+
+                # QUIT
+                if key == ord('q'):
+                    break
+
+                # SCENE
+                if (key >= 48 and key <= 57) or key == 43:
+                    page = 'scene'
+
+                # MANU
+                if key == ord('m'):
+                    page = 'manu'
+                    freetxt = ''
+
+                # HELP
+                if key == ord('h'):
+                    win.clear()
+                    win.addstr("\n BEAUCOUP help: \n", curses.A_STANDOUT)
+                    win.addstr("\n   Destination: \n", curses.A_BOLD)
+                    win.addstr("      #to all            = broadcast \n")
+                    win.addstr("      #to 45 53 54       = send to titreur 45, 53 and 54 \n")
+                    win.addstr("      #ip 2.0.11.50      = send to 2.0.11.50 \n")
+                    win.addstr("      #port 3742         = change port (default 3742) \n")
+
+                    win.addstr("\n   Scenario: \n", curses.A_BOLD)
+                    win.addstr("      #wait 1.5          = pause for 1.5 s \n")
+                    win.addstr("      #waitms 1000       = pause for 1000 ms \n")
+                    win.addstr("      #loop              = restart from beggining \n")
+                    win.addstr("      #quit              = exit scenario \n")
+
+                    win.addstr("\n   Display text: \n", curses.A_BOLD)
+                    win.addstr("      text MODE blablba       = display \"blablba\" using MODE \n")
+                    win.addstr("      text MODE line1/line2   = display \"line1\" and \"line2\" using MODE \n")
+                    win.addstr("         Available Modes:\n")
+                    win.addstr("           NO_SCROLL_NORMAL\n")
+                    win.addstr("           SCROLL_NORMAL\n")
+                    win.addstr("           SCROLL_LOOP_NORMAL\n")
+                    win.addstr("           NO_SCROLL_BIG\n")
+                    win.addstr("           SCROLL_BIG\n")
+                    win.addstr("           SCROLL_LOOP_BIG\n")
+
+                    win.addstr("\n   Random playlist: \n", curses.A_BOLD)
+                    win.addstr("      clear              = empty playlist \n")
+                    win.addstr("      add MODE blabla    = add \"blabla\" with MODE to playlist \n")
+                    win.addstr("      speed 1000         = playlist next item in ms \n")
+                    win.addstr("      speed 1000 2000    = playlist next item in ms, random \n")
+
+                    win.addstr("\n   Misc: \n", curses.A_BOLD)
+                    win.addstr("      scroll 50          = scroll speed \n")
+
+
+
+
+            #
+            # SCENE
+            #
+            if page == 'scene':
+
+                if key == 27:
+                    page = 'home'
+                    scenarioThread.stop()
+
+                # 0 - 10 : select scenario
+                if (key >= 48 and key <= 57) or key == 43:
+                    sc = key-48
+                    if key == 43: sc = 10
+                    scenarioThread.stop()
+                    scenarioThread = FuncThread(play_scenario, win)
+                    scenarioThread.scene(sc)
+                    scenarioThread.start()
+                    page = 'scene'
+
+
+            #
+            # MANU
+            #
+            if page == 'manu':
+
+                if key == 27:
+                    page = 'home'
+
+                cFt = freetxt
+                if page == currentPage:
+                    # CHAR
+                    if key >= 32 and key <= 168:
+                        freetxt += chr(key)
+                    # BACKSPACE
+                    elif key == 263:
+                        freetxt = freetxt[:-1]
+                    # ENTER = clear
+                    elif key == 10:
+                        freetxt = ''
+
+                    if cFt != freetxt:
+                        if '/' in freetxt:
+                            cmd = 'text NO_SCROLL_NORMAL '+freetxt
+                        else:
+                            cmd = 'text NO_SCROLL_BIG '+freetxt
+                        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                        sock.sendto(cmd.encode('utf-8'), (BROADCAST, PORT))
+
+
                 win.clear()
-                win.addstr("\n BEAUCOUP help: \n", curses.A_STANDOUT)
-                win.addstr("\n   Destination: \n", curses.A_BOLD)
-                win.addstr("      #to all            = broadcast \n")
-                win.addstr("      #to 45 53 54       = send to titreur 45, 53 and 54 \n")
-                win.addstr("      #ip 2.0.11.50      = send to 2.0.11.50 \n")
-                win.addstr("      #port 3742         = change port (default 3742) \n")
-
-                win.addstr("\n   Scenario: \n", curses.A_BOLD)
-                win.addstr("      #wait 1.5          = pause for 1.5 s \n")
-                win.addstr("      #waitms 1000       = pause for 1000 ms \n")
-                win.addstr("      #loop              = restart from beggining \n")
-                win.addstr("      #quit              = exit scenario \n")
-
-                win.addstr("\n   Display text: \n", curses.A_BOLD)
-                win.addstr("      text MODE blablba       = display \"blablba\" using MODE \n")
-                win.addstr("      text MODE line1/line2   = display \"line1\" and \"line2\" using MODE \n")
-                win.addstr("         Available Modes:\n")
-                win.addstr("           NO_SCROLL_NORMAL\n")
-                win.addstr("           SCROLL_NORMAL\n")
-                win.addstr("           SCROLL_LOOP_NORMAL\n")
-                win.addstr("           NO_SCROLL_BIG\n")
-                win.addstr("           SCROLL_BIG\n")
-                win.addstr("           SCROLL_LOOP_BIG\n")
-
-                win.addstr("\n   Random playlist: \n", curses.A_BOLD)
-                win.addstr("      clear              = empty playlist \n")
-                win.addstr("      add MODE blabla    = add \"blabla\" with MODE to playlist \n")
-                win.addstr("      speed 1000         = playlist next item in ms \n")
-                win.addstr("      speed 1000 2000    = playlist next item in ms, random \n")
-
-                win.addstr("\n   Misc: \n", curses.A_BOLD)
-                win.addstr("      scroll 50          = scroll speed \n")
+                win.addstr("\n BEAUCOUP BEAUCOUP \n", curses.A_STANDOUT)
+                win.addstr("   ESC to exit - '/' second line of text\n")
+                win.addstr("\n   Free Text: \n\n", curses.A_BOLD)
+                win.addstr("         "+freetxt)
 
 
-            # 0 - 9
-            elif key >= 48 and key <= 57:
-                scenarioThread.stop()
-                scenarioThread = FuncThread(play_scenario, win)
-                scenarioThread.scene(key-48)
-                scenarioThread.start()
 
-            elif key == 43:
-                scenarioThread.stop()
-                scenarioThread = FuncThread(play_scenario, win)
-                scenarioThread.scene(10)
-                scenarioThread.start()
+            if key == -1: time.sleep(0.1)
+            # else: win.addstr(str(key))
 
-            else:
-                # if key != -1: win.addstr(str(key))
-                time.sleep(0.1)
+
 
 
         # except Exception as e:
