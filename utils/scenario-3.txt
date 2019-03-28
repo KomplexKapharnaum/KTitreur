@@ -1,4 +1,3 @@
-#to 44 45 48 50 51 52
 clear
 speed 100
 add NO_SCROLL_BIG    TOUCH
@@ -9,7 +8,6 @@ add NO_SCROLL_BIG    TOUCHhHH
 
 #waitms 435
 
-#to 44 45 48 50 51 52
 clear
 speed 200
 add NO_SCROLL_BIG      ME

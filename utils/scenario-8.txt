@@ -1,7 +1,4 @@
-#to 44 45 48 50 51 52
 clear
 speed 109
 add NO_SCROLL_BIG   BEAUCOUP
 add NO_SCROLL_BIG  _
-
-#quit

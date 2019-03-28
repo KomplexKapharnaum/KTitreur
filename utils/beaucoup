@@ -6,9 +6,12 @@ import threading
 import time
 import socket
 
-BROADCAST = IP = '2.0.255.255'
+BROADCAST = '2.0.255.255'
+TITREURS = ['2.0.11.44', '2.0.11.45', '2.0.11.48', '2.0.11.50', '2.0.11.51', '2.0.11.52']
+IP = TITREURS.copy()
 PORT = 3742
 EVENT = threading.Event()
+CONSOLE = ''
 
 class FuncThread(threading.Thread):
     def __init__(self, target, window):
@@ -19,6 +22,7 @@ class FuncThread(threading.Thread):
 
     def scene(self, num):
         self._scene = num
+        self.start()
 
     def run(self):
         self._target(self._window, self._scene)
@@ -34,8 +38,7 @@ class FuncThread(threading.Thread):
 def play_scenario(win, num):
     path = 'scenario-'+str(num)+'.txt'
 
-    win.clear()
-    win.addstr("\n BEAUCOUP scenario: "+str(num)+" \n", curses.A_STANDOUT)
+    scene_win(win, str(num))
 
     if not os.path.exists(path):
         win.addstr("\n ERROR: File "+path+" not found")
@@ -46,11 +49,9 @@ def play_scenario(win, num):
     content = [x.strip() for x in content]   # remove \n
 
 
-    win.addstr("\n Playing "+path+"\n")
-    while execute_content(win, content):
-        win.clear()
-        win.addstr("\n BEAUCOUP scenario: "+str(num)+" \n", curses.A_STANDOUT)
-        win.addstr("   ESC to exit\n")
+    # win.addstr("\n Playing "+path+"\n")
+    while run_content(win, content):
+        scene_win(win, str(num))
 
     global EVENT
     if EVENT.is_set():
@@ -61,110 +62,196 @@ def play_scenario(win, num):
     return True
 
 
-def execute_content(win, content):
-    global BROADCAST, IP, PORT, EVENT
+def run_content(win, content):
+    global EVENT
 
     for line in content:
         if EVENT.is_set():
             return False
 
         line = line.strip()
+        if line.startswith('#loop'): return True
+        elif line.startswith('#quit'): return False
+        else: execute_cmd(win, line)
 
-        # PARSING META
-        if line.startswith('#'):
-            data = line.split(' ')
+    return False
 
-            if data[0] == "#ip":
-                if len(data) > 1:
-                    IP = data[1:]
-                    win.addstr("\n #ip: "+str(IP))
-            elif data[0] == "#to":
-                if len(data) > 1:
-                    IP = []
-                    for to in data[1:]:
-                        if to == 'all':
-                            IP.append(BROADCAST)
-                        else:
-                            IP.append('2.0.11.'+str(int(to)))
-                    win.addstr("\n #to: "+str(IP))
-            elif data[0] == "#port":
-                if len(data) > 1:
-                    PORT = int(data[1])
-                    win.addstr("\n #port: "+str(PORT))
-            elif data[0] == "#waitms":
-                if len(data) > 1:
-                    win.addstr("\n #wait for: "+str(int(data[1])/1000.0)+"s")
-                    EVENT.wait(timeout=int(data[1])/1000.0)
-            elif data[0] == "#wait":
-                if len(data) > 1:
-                    time = int(float(data[1])*1000)
-                    if len(data) > 2:
-                        time2 = int(float(data[2])*1000)
-                        time = random.randint(time,time2)
-                    win.addstr("\n #wait for: "+str(time/1000.0)+"s")
-                    EVENT.wait(timeout=time/1000.0)
-            elif data[0] == "#quit":
-                win.addstr("\n #quit")
-                return False
-            elif data[0] == "#loop":
-                win.addstr("\n #loop")
-                return True
-            elif data[0] == "#clearscreen":
-                win.clear()
 
-        # SENDING COMMANDS
-        elif line != '':
-            for ip in IP:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                if ip.endswith('255'):
-                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                sock.sendto(line.encode('utf-8'), (ip, PORT))
-            # time.sleep(0.1)
-            win.addstr("\n sent: "+line)
+def execute_cmd(win, line):
+    global IP, PORT, EVENT, TITREURS
+
+    # PARSING META
+    if line.startswith('#'):
+        data = line.split(' ')
+
+        if data[0] == "#ip":
+            if len(data) > 1:
+                IP = data[1:]
+                win.addstr("\n #ip: "+str(IP))
+        elif data[0] == "#to":
+            if len(data) > 1:
+                IP = []
+                for to in data[1:]:
+                    if to == 'all': IP =  TITREURS.copy()
+                    else: IP.append('2.0.11.'+str(int(to)))
+                win.addstr("\n #to: "+str(IP))
+        elif data[0] == "#port":
+            if len(data) > 1:
+                PORT = int(data[1])
+                win.addstr("\n #port: "+str(PORT))
+        elif data[0] == "#waitms":
+            if len(data) > 1:
+                win.addstr("\n #wait for: "+str(int(data[1])/1000.0)+"s")
+                EVENT.wait(timeout=int(data[1])/1000.0)
+        elif data[0] == "#wait":
+            if len(data) > 1:
+                time = int(float(data[1])*1000)
+                if len(data) > 2:
+                    time2 = int(float(data[2])*1000)
+                    time = random.randint(time,time2)
+                win.addstr("\n #wait for: "+str(time/1000.0)+"s")
+                EVENT.wait(timeout=time/1000.0)
+        elif data[0] == "#quit":
+            win.addstr("\n #quit")
+            return False
+        elif data[0] == "#loop":
+            win.addstr("\n #loop")
+            return True
+        elif data[0] == "#clearscreen":
+            win.clear()
+
+    # SENDING COMMANDS
+    elif line != '':
+        send(line)
+        win.addstr("\n sent: "+line)
+
+
+def send(line):
+    global IP, PORT
+    for ip in IP:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        if ip.endswith('255'):
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.sendto(line.encode('utf-8'), (ip, PORT))
+
+
+def sendtoall(line):
+    global BROADCAST, PORT
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    sock.sendto(line.encode('utf-8'), (BROADCAST, PORT))
+
+
+def header_win(win):
+    global TITREURS, IP
+    win.clear()
+    win.addstr("\n BEAUCOUP BEAUCOUP \n", curses.A_STANDOUT)
+    win.addstr("  Selected devices: ")
+    for k, d in enumerate(TITREURS):
+        mode = curses.A_STANDOUT if d in IP  else curses.A_BOLD
+        win.addstr(" ")
+        win.addstr(" "+str(k+1)+" ", mode)
+    win.addstr("\n\n")
+
+
+def home_win(win):
+    header_win(win)
+    win.addstr(" HOME \n", curses.A_STANDOUT)
+    win.addstr("\t0-9 for FX scenario \n\tINSER for playlist \n\tSUPPR for freetext \n\tFIN for clearall \n\th for help \n\tESC to quit ")
+
+
+def manu_win(win, txt):
+    header_win(win)
+    win.addstr(" FREETEXT \n", curses.A_STANDOUT)
+    win.addstr("   Live typing - '/' second line of text\n\n")
+    win.addstr("   "+txt.replace('/','\n   '))
+
+def playlist_win(win):
+    header_win(win)
+    win.addstr(" PLAYLIST \n", curses.A_STANDOUT)
+    win.addstr("\n")
+
+def scene_win(win, num):
+    header_win(win)
+    win.addstr(" FX Scene: "+str(num)+" \n", curses.A_STANDOUT)
 
 
 def main(win):
+    global IP, BROADCAST, TITREURS
+
     scenarioThread = FuncThread(play_scenario, win)
     win.nodelay(True)
     curses.resizeterm(50,100)
     page = 'home'
-    currentPage = ''
+    home_win(win)
+    freetxt = ''
 
     while 1:
         # try:
             key = win.getch()
 
-            if page != currentPage:
-                currentPage = page
+            #
+            # PAGE SELECT
+            #
+            if key == 262:  # HOME
+                page = 'home'
+                scenarioThread.stop()
+                home_win(win)
 
-                # CLEAR ALL
-                cmd = "clear"
-                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                sock.sendto(cmd.encode('utf-8'), (BROADCAST, PORT))
+            #PLAYLIST
+            elif key == 331: # INSER
+                page = 'playlist'
+                scenarioThread.stop()
+                IP = []
 
-                if page == 'home':
-                    win.clear()
-                    win.addstr("\n BEAUCOUP BEAUCOUP \n", curses.A_STANDOUT)
-                    win.addstr("  press 0-9 for scenario / m for freetext / h for help / q to quit ")
+            # FREETEXT
+            elif key == 339: # PAGEUP
+                page = 'manu'
+                scenarioThread.stop()
+                freetxt = ''
+                IP = TITREURS.copy()
+                manu_win(win, freetxt)
+                continue
+
+            # SCENE FX
+            elif (page == 'home' or page == 'scene') and (key >= 48 and key <= 57):
+                page = 'scene'
+                scenarioThread.stop()
+                scenarioThread = FuncThread(play_scenario, win)
+                scenarioThread.scene(key-48)
+
+            # CLEARALL
+            elif key == 360: # END
+                sendtoall('clear')
+
+            # CLEARSELECTED
+            elif key == 330: # SUPPR
+                execute_cmd('clear')
+
+
+            # DEVICE SELECTOR
+            elif key >= 265 and key <= 276:
+                if key == 276: # F12
+                    if len(IP) > 0: IP = []
+                    else: IP = TITREURS.copy()
+                else: # F1 -> F11
+                    sel = key-265
+                    if sel < len(TITREURS):
+                        if TITREURS[sel] in IP: IP.remove(TITREURS[sel])
+                        else: IP.append(TITREURS[sel])
+
+
 
             #
-            # HOME
+            # HOME SPECIFIC
             #
             if page == 'home':
 
+                home_win(win)
+
                 # QUIT
-                if key == ord('q'):
+                if key == 27:
                     break
-
-                # SCENE
-                if (key >= 48 and key <= 57) or key == 43:
-                    page = 'scene'
-
-                # MANU
-                if key == ord('m'):
-                    page = 'manu'
-                    freetxt = ''
 
                 # HELP
                 if key == ord('h'):
@@ -203,26 +290,14 @@ def main(win):
                     win.addstr("      scroll 50          = scroll speed \n")
 
 
-
-
             #
-            # SCENE
+            # PLAYLIST
             #
-            if page == 'scene':
+            if page == 'playlist':
+                playlist_win(win)
 
-                if key == 27:
-                    page = 'home'
-                    scenarioThread.stop()
 
-                # 0 - 10 : select scenario
-                if (key >= 48 and key <= 57) or key == 43:
-                    sc = key-48
-                    if key == 43: sc = 10
-                    scenarioThread.stop()
-                    scenarioThread = FuncThread(play_scenario, win)
-                    scenarioThread.scene(sc)
-                    scenarioThread.start()
-                    page = 'scene'
+
 
 
             #
@@ -230,41 +305,29 @@ def main(win):
             #
             if page == 'manu':
 
-                if key == 27:
-                    page = 'home'
-
                 cFt = freetxt
-                if page == currentPage:
-                    # CHAR
-                    if key >= 32 and key <= 168:
-                        freetxt += chr(key)
-                    # BACKSPACE
-                    elif key == 263:
-                        freetxt = freetxt[:-1]
-                    # ENTER = clear
-                    elif key == 10:
-                        freetxt = ''
+                # CHAR
+                if key >= 32 and key <= 168:
+                    freetxt += chr(key)
+                # BACKSPACE
+                elif key == 263:
+                    freetxt = freetxt[:-1]
+                # ENTER = clear
+                elif key == 10:
+                    freetxt = ''
 
-                    if cFt != freetxt:
-                        if '/' in freetxt:
-                            cmd = 'text NO_SCROLL_NORMAL '+freetxt
-                        else:
-                            cmd = 'text NO_SCROLL_BIG '+freetxt
-                        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                        sock.sendto(cmd.encode('utf-8'), (BROADCAST, PORT))
+                if cFt != freetxt:
+                    if '/' in freetxt: cmd = 'text NO_SCROLL_NORMAL '+freetxt
+                    else: cmd = 'text NO_SCROLL_BIG '+freetxt
+                    send(cmd)
 
+                manu_win(win, freetxt)
 
-                win.clear()
-                win.addstr("\n BEAUCOUP BEAUCOUP \n", curses.A_STANDOUT)
-                win.addstr("   ESC to exit - '/' second line of text\n")
-                win.addstr("\n   Free Text: \n\n", curses.A_BOLD)
-                win.addstr("         "+freetxt)
 
 
 
             if key == -1: time.sleep(0.1)
-            # else: win.addstr(str(key))
+            else: win.addstr("\n\n"+str(key))
 
 
 

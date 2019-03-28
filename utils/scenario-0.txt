@@ -1,7 +1,4 @@
-#to 44 45 48 50 51 52
-
+#to all
 clear
-
 #wait 1
-
 #loop
