@@ -1,4 +1,4 @@
-#to all
-clear
-#wait 1
-#loop
+#clear
+#clear
+#clear
+#clear

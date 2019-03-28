@@ -1,21 +1,21 @@
-clear
-speed 100
-add NO_SCROLL_BIG    TOUCH
-add NO_SCROLL_BIG     TOUCH
-add NO_SCROLL_BIG    TOUCH H
-add NO_SCROLL_BIG   TOUCHhHH
-add NO_SCROLL_BIG    TOUCHhHH
+#clear
+#speed 100
+#add    TOUCH
+#add     TOUCH
+#add    TOUCH H
+#add   TOUCHhHH
+#add    TOUCHhHH
 
 #waitms 435
 
-clear
-speed 200
-add NO_SCROLL_BIG      ME
-add NO_SCROLL_BIG       ME
-add NO_SCROLL_BIG    ME
-add NO_SCROLL_BIG      ME
-add NO_SCROLL_BIG        ME
-add NO_SCROLL_BIG       ME
+#clear
+#speed 200
+#add      ME
+#add       ME
+#add    ME
+#add      ME
+#add        ME
+#add       ME
 
 #waitms 435
 #loop

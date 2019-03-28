@@ -1,12 +1,10 @@
-clear
-speed 0
-text NO_SCROLL_BIG ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ
+#clear
+#speed 0
+#text ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ
 #quit
 
 
 
-clear
-speed 400
-add NO_SCROLL_BIG Ñ ~ Ý å ì òó
-#add NO_SCROLL_BIG Ó Õ Þ æ í òõ
-#add NO_SCROLL_BIG ~`|ÍÕ
+Ñ ~ Ý å ì òó
+Ó Õ Þ æ í òõ
+~`|ÍÕ

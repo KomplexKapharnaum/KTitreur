@@ -1,24 +1,24 @@
-clear
-speed 100
-add NO_SCROLL_BIG   FEEL
-add NO_SCROLL_BIG      FEEL
-add NO_SCROLL_BIG     FEEL
-add NO_SCROLL_BIG    FEEL
-add NO_SCROLL_BIG  FEEL
-add NO_SCROLL_BIG   FEEL
-#add NO_SCROLL_BIG  _
+#clear
+#speed 100
+#add   FEEL
+#add      FEEL
+#add     FEEL
+#add    FEEL
+#add  FEEL
+#add   FEEL
+##add  _
 
 #waitms 970
 
-clear
-speed 100
-add NO_SCROLL_BIG THE PARTY
-add NO_SCROLL_BIG  THE PARTY
-add NO_SCROLL_BIG    THE PARTY
-add NO_SCROLL_BIG THE PARTY
-add NO_SCROLL_BIG   THE PARTY
-add NO_SCROLL_BIG  THE PARTY
-#add NO_SCROLL_BIG  _
+#clear
+#speed 100
+#add THE PARTY
+#add  THE PARTY
+#add    THE PARTY
+#add THE PARTY
+#add   THE PARTY
+#add  THE PARTY
+##add  _
 
 #waitms 970
 #loop

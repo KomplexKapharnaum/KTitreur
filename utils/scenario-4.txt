@@ -1,8 +1,8 @@
-scroll 5 25
-speed 5000 10000
-text SCROLL_LOOP_NORMAL                             beaucoup                           BEAUCOUP       /                                              beaucoup                                 beaucoup
-text SCROLL_LOOP_NORMAL                     beaucoup                                      beaucoup       /                           BEAUCOUP                 beaucoup
-text SCROLL_LOOP_NORMAL                             beaucoup                       beaucoup       /                                                      beaucoup                                 beaucoup
-text SCROLL_LOOP_NORMAL              beaucoup                              beaucoup       /                                     beaucoup                                 beaucoup
-text SCROLL_LOOP_NORMAL                                   beaucoup                                     beaucoup       /                           BEAUCOUP                 beaucoup
-text SCROLL_LOOP_NORMAL                         beaucoup                           BEAUCOUP       /                                        beaucoup                                 beaucoup
+#scroll 5 25
+#speed 5000 10000
+#text                             beaucoup                           BEAUCOUP       /                                              beaucoup                                 beaucoup
+#text                     beaucoup                                      beaucoup       /                           BEAUCOUP                 beaucoup
+#text                             beaucoup                       beaucoup       /                                                      beaucoup                                 beaucoup
+#text              beaucoup                              beaucoup       /                                     beaucoup                                 beaucoup
+#text                                   beaucoup                                     beaucoup       /                           BEAUCOUP                 beaucoup
+#text                         beaucoup                           BEAUCOUP       /                                        beaucoup                                 beaucoup

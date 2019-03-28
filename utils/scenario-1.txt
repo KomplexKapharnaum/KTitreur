@@ -1,12 +1,12 @@
-speed 10
-text NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG   ÍÍÍÍÍÍÍÍ
+#speed 10
+#text BEAUCOUP
+#add ÍÍÍÍÍÍÍÍ
 
-#wait 0.3 3
+#wait 0.3 0.8
 
-speed 0
-text NO_SCROLL_BIG   BEAUCOUP
+#speed 0
+#text BEAUCOUP
 
-#wait 0.3 2
+#wait 1 5
 
 #loop

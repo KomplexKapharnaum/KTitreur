@@ -1,33 +1,33 @@
-clear
-speed 10
-add NO_SCROLL_BIG   BEAUCOUP Þ
-add NO_SCROLL_BIG Þ BEAUCOUP
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG   be-J_o-p
+#clear
+#speed 10
+#add   BEAUCOUP Þ
+#add Þ BEAUCOUP
+#add   BEAUCOUP
+#add   be-J_o-p
 
 #wait 2
 
-clear
-speed 10
-add NO_SCROLL_BIG    AMOUR
-add NO_SCROLL_BIG  _
-add NO_SCROLL_BIG   = mç-$-
+#clear
+#speed 10
+#add    AMOUR
+#add  _
+#add   = mç-$-
 
 #wait 2
 
-clear
-speed 10
-add NO_SCROLL_BIG å BEAUCOUP
-add NO_SCROLL_BIG   BEAUCOUP å
-add NO_SCROLL_BIG   be-J_o-p
+#clear
+#speed 10
+#add å BEAUCOUP
+#add   BEAUCOUP å
+#add   be-J_o-p
 
 #wait 2
 
-clear
-speed 50
-add NO_SCROLL_BIG  MUCHO
-add NO_SCROLL_BIG       CALOR
-add NO_SCROLL_BIG  _
+#clear
+#speed 50
+#add  MUCHO
+#add       CALOR
+#add  _
 
 #wait 2
 #loop

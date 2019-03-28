@@ -1,4 +1,4 @@
-clear
-speed 420
-add NO_SCROLL_BIG   BEAUCOUP
-add NO_SCROLL_BIG  _
+#clear
+#speed 420
+#add   BEAUCOUP
+#add  _

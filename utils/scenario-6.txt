@@ -1,3 +1,3 @@
-clear
-speed 1
-text NO_SCROLL_BIG ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ
+#clear
+#speed 1
+#text ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ

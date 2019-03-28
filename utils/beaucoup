@@ -11,7 +11,11 @@ TITREURS = ['2.0.11.44', '2.0.11.45', '2.0.11.48', '2.0.11.50', '2.0.11.51', '2.
 IP = TITREURS.copy()
 PORT = 3742
 EVENT = threading.Event()
-CONSOLE = ''
+CONSOLE = []
+CURRENTPL = {}
+for d in TITREURS:
+    CURRENTPL[d] = []
+
 
 class FuncThread(threading.Thread):
     def __init__(self, target, window):
@@ -122,8 +126,19 @@ def execute_cmd(win, line):
 
     # SENDING COMMANDS
     elif line != '':
+        global CURRENTPL
         send(line)
         win.addstr("\n sent: "+line)
+
+        # STORE PL
+        if line == 'clear':
+            for d in IP: CURRENTPL[d] = []
+        elif line.startswith('text'):
+            for d in IP: CURRENTPL[d] = [(' ').join(line.split(' ')[2:])]
+        elif line.startswith('add'):
+            for d in IP: CURRENTPL[d].append((' ').join(line.split(' ')[2:]))
+
+    CONSOLE.append(line)
 
 
 def send(line):
@@ -151,29 +166,48 @@ def header_win(win):
         mode = curses.A_STANDOUT if d in IP  else curses.A_BOLD
         win.addstr(" ")
         win.addstr(" "+str(k+1)+" ", mode)
+    win.addstr("\n\n\n")
+
+def console_win(win):
+    global CONSOLE
+    win.addstr("\n\n CONSOLE \n", curses.A_STANDOUT)
+    win.addstr("  "+("\n  ").join(CONSOLE))
     win.addstr("\n\n")
 
 
 def home_win(win):
     header_win(win)
     win.addstr(" HOME \n", curses.A_STANDOUT)
-    win.addstr("\t0-9 for FX scenario \n\tINSER for playlist \n\tSUPPR for freetext \n\tFIN for clearall \n\th for help \n\tESC to quit ")
-
+    win.addstr("\t0-9 for FX scenario \n\tINSER for playlist \n\tPAGEUP for freetext \n\tSUPPR to clear selected \n\tFIN to clearall \n\th for help \n\tESC to quit ")
+    # console_win(win)
 
 def manu_win(win, txt):
     header_win(win)
     win.addstr(" FREETEXT \n", curses.A_STANDOUT)
-    win.addstr("   Live typing - '/' second line of text\n\n")
-    win.addstr("   "+txt.replace('/','\n   '))
+    win.addstr("  Live typing - '/' second line of text\n\n")
+    win.addstr("  "+txt.replace('/','\n  '))
+    console_win(win)
 
-def playlist_win(win):
+def playlist_win(win, txt):
+    global CURRENTPL
     header_win(win)
     win.addstr(" PLAYLIST \n", curses.A_STANDOUT)
+    for k, d in enumerate(TITREURS):
+        mode = curses.A_STANDOUT if d in IP  else curses.A_BOLD
+        win.addstr(" "+str(k+1)+" ", mode)
+        win.addstr("  "+(' | ').join(CURRENTPL[d]))
+        win.addstr("\n")
+
+    win.addstr("\n\n")
+    win.addstr(" ADD TEXT \n", curses.A_STANDOUT)
+    win.addstr("   "+txt.replace('/','\n    '))
     win.addstr("\n")
+    console_win(win)
 
 def scene_win(win, num):
     header_win(win)
     win.addstr(" FX Scene: "+str(num)+" \n", curses.A_STANDOUT)
+    console_win(win)
 
 
 def main(win):
@@ -185,6 +219,7 @@ def main(win):
     page = 'home'
     home_win(win)
     freetxt = ''
+    playtxt = ''
 
     while 1:
         # try:
@@ -201,8 +236,11 @@ def main(win):
             #PLAYLIST
             elif key == 331: # INSER
                 page = 'playlist'
+                playtxt = ''
                 scenarioThread.stop()
                 IP = []
+                playlist_win(win, playtxt)
+                continue
 
             # FREETEXT
             elif key == 339: # PAGEUP
@@ -226,7 +264,7 @@ def main(win):
 
             # CLEARSELECTED
             elif key == 330: # SUPPR
-                execute_cmd('clear')
+                execute_cmd(win, 'clear')
 
 
             # DEVICE SELECTOR
@@ -294,7 +332,27 @@ def main(win):
             # PLAYLIST
             #
             if page == 'playlist':
-                playlist_win(win)
+
+                # CHAR
+                if key >= 32 and key <= 168:
+                    playtxt += chr(key)
+                # BACKSPACE
+                elif key == 263:
+                    playtxt = playtxt[:-1]
+                # ENTER = add
+                elif key == 10:
+                    if playtxt.startswith('scroll') or playtxt.startswith('speed'):
+                        cmd = playtxt
+                    elif '/' in playtxt:
+                        if len(playtxt.split('/')[1]) < 9: cmd = 'add NO_SCROLL_NORMAL '+playtxt
+                        else: cmd = 'add SCROLL_LOOP_NORMAL '+playtxt
+                    else:
+                        if len(playtxt) < 9: cmd = 'add NO_SCROLL_BIG '+playtxt
+                        else: cmd = 'add SCROLL_LOOP_BIG '+playtxt
+                    execute_cmd(win, cmd)
+                    playtxt = ''
+
+                playlist_win(win, playtxt)
 
 
 
@@ -317,13 +375,15 @@ def main(win):
                     freetxt = ''
 
                 if cFt != freetxt:
-                    if '/' in freetxt: cmd = 'text NO_SCROLL_NORMAL '+freetxt
-                    else: cmd = 'text NO_SCROLL_BIG '+freetxt
-                    send(cmd)
+                    if '/' in freetxt:
+                        if len(freetxt.split('/')[1]) < 9: cmd = 'text NO_SCROLL_NORMAL '+freetxt
+                        else: cmd = 'text SCROLL_LOOP_NORMAL '+freetxt
+                    else:
+                        if len(freetxt) < 9: cmd = 'text NO_SCROLL_BIG '+freetxt
+                        else: cmd = 'text SCROLL_LOOP_BIG '+freetxt
+                    execute_cmd(win, cmd)
 
                 manu_win(win, freetxt)
-
-
 
 
             if key == -1: time.sleep(0.1)
