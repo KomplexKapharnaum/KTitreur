@@ -7,147 +7,165 @@ import time
 import socket
 
 BROADCAST = '2.0.255.255'
-TITREURS = ['2.0.11.44', '2.0.11.45', '2.0.11.48', '2.0.11.50', '2.0.11.51', '2.0.11.52']
-IP = TITREURS.copy()
+DEVICES = ['2.0.11.44', '2.0.11.45', '2.0.11.48', '2.0.11.50', '2.0.11.51', '2.0.11.52']
+TITREURS = []
 PORT = 3742
-EVENT = threading.Event()
 CONSOLE = []
-CURRENTPL = {}
-for d in TITREURS:
-    CURRENTPL[d] = []
 
 
-class FuncThread(threading.Thread):
-    def __init__(self, target, window):
+def getMode(txt):
+    if '/' in txt:
+        if len(txt.split('/')[1]) < 9: return 'NO_SCROLL_NORMAL'
+        else: return 'SCROLL_LOOP_NORMAL'
+    else:
+        if len(txt) < 13: return 'NO_SCROLL_BIG'
+        else: return 'SCROLL_LOOP_BIG'
+
+
+class Titreur():
+    def __init__(self, ip):
+        global PORT
+        self.ip = ip
+        self.port = PORT
+        self.selected = True
+        # self.mode = None
+        self.scene_val = 0
+        self.scroll_val = 0
+        self.speed_val = [1000,1000]
+        self.currentPL = []
+        self.scenario = ScenarioThread(self)
+        self.information = ''
+
+    def send(self, cmd):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(cmd.encode('utf-8'), (self.ip, self.port))
+
+    def clear(self):
+        self.currentPL = []
+        self.send('clear')
+
+    def text(self, txt, mode=None ):
+        self.currentPL = [txt]
+        if not mode: mode = getMode(txt)
+        if txt == '': txt = '_'
+        self.send('text '+mode+' '+txt)
+
+    def add(self, txt, mode=None):
+        self.currentPL.append(txt)
+        if not mode: mode = getMode(txt)
+        self.send('add '+mode+' '+txt)
+
+    def scene(self, num):
+        self.scene_val = num
+        self.scenario.stop()
+        self.scenario = ScenarioThread(self)
+        self.scenario.scene(num)
+
+    def stop(self):
+        self.scene_val = 0
+        self.scenario.stop()
+        self.info("")
+
+    def info(self, txt):
+        self.information = txt
+
+    def speed(self, min, max=None):
+        if not max: max = min
+        self.speed_val = [min,max]
+        self.send('speed '+str(min)+' '+str(max))
+
+    def scroll(self, s):
+        self.scroll_val = s
+        self.send('scroll '+str(s))
+
+
+class ScenarioThread(threading.Thread):
+    def __init__(self, titreur):
         threading.Thread.__init__(self)
-        self._target = target
-        self._window = window
+        self._titreur = titreur
         self._scene = 0
+        self._event = threading.Event()
 
     def scene(self, num):
         self._scene = num
         self.start()
 
+
     def run(self):
-        self._target(self._window, self._scene)
+        path = 'scenario-'+str(self._scene)+'.txt'
+        path = os.path.join( os.path.dirname(os.path.realpath(__file__)), path )
+
+        if not os.path.exists(path):
+            self._titreur.info("ERROR: File "+path+" not found")
+            return False
+
+        with open(path) as f:
+            content = f.readlines()
+        content = [x.strip() for x in content]   # remove \n
+
+        doLoop = True
+        self._titreur.info("")
+        while doLoop:
+            doLoop = False
+            for line in content:
+                if self._event.is_set(): break
+                line = line.strip()
+                if line.startswith('#loop'):
+                    self._titreur.info("Loop.")
+                    doLoop = True
+                    break
+                elif line.startswith('#quit'):
+                    doLoop = False
+                    break
+                else:
+
+                    # PARSING
+                    if line.startswith('#'):
+                        data = line.split(' ')
+
+                        if data[0] == "#waitms":
+                            if len(data) > 1:
+                                self._event.wait(timeout=int(data[1])/1000.0)
+
+                        elif data[0] == "#wait":
+                            if len(data) > 1:
+                                time = int(float(data[1])*1000)
+                                if len(data) > 2:
+                                    time2 = int(float(data[2])*1000)
+                                    time = random.randint(time,time2)
+                                self._event.wait(timeout=time/1000.0)
+
+                        elif data[0] == "#clear":
+                            self._titreur.clear()
+
+                        elif data[0] == "#text":
+                            if len(data) > 1:
+                                self._titreur.text((' ').join(data[1:]))
+
+                        elif data[0] == "#add":
+                            if len(data) > 1:
+                                self._titreur.add((' ').join(data[1:]))
+
+                        elif data[0] == "#speed":
+                            if len(data) == 2: data.append(data[1])
+                            if len(data) > 1:
+                                self._titreur.speed(data[1], data[2])
+
+                        elif data[0] == "#scroll":
+                            if len(data) > 1:
+                                self._titreur.scroll(data[1])
+
+        if self._event.is_set():
+            self._titreur.info("Stopped.")
+        self._titreur.info("Done.")
+
 
     def stop(self):
         if self.isAlive():
-            global EVENT
-            EVENT.set()
+            self._event.set()
             self.join()
-        EVENT.clear()
+        self._event.clear()
 
-
-def play_scenario(win, num):
-    path = 'scenario-'+str(num)+'.txt'
-
-    scene_win(win, str(num))
-
-    if not os.path.exists(path):
-        win.addstr("\n ERROR: File "+path+" not found")
-        return False
-
-    with open(path) as f:
-        content = f.readlines()
-    content = [x.strip() for x in content]   # remove \n
-
-
-    # win.addstr("\n Playing "+path+"\n")
-    while run_content(win, content):
-        scene_win(win, str(num))
-
-    global EVENT
-    if EVENT.is_set():
-        win.addstr("\n\n Stopped.")
-        return False
-
-    win.addstr("\n\n Done.")
-    return True
-
-
-def run_content(win, content):
-    global EVENT
-
-    for line in content:
-        if EVENT.is_set():
-            return False
-
-        line = line.strip()
-        if line.startswith('#loop'): return True
-        elif line.startswith('#quit'): return False
-        else: execute_cmd(win, line)
-
-    return False
-
-
-def execute_cmd(win, line):
-    global IP, PORT, EVENT, TITREURS
-
-    # PARSING META
-    if line.startswith('#'):
-        data = line.split(' ')
-
-        if data[0] == "#ip":
-            if len(data) > 1:
-                IP = data[1:]
-                win.addstr("\n #ip: "+str(IP))
-        elif data[0] == "#to":
-            if len(data) > 1:
-                IP = []
-                for to in data[1:]:
-                    if to == 'all': IP =  TITREURS.copy()
-                    else: IP.append('2.0.11.'+str(int(to)))
-                win.addstr("\n #to: "+str(IP))
-        elif data[0] == "#port":
-            if len(data) > 1:
-                PORT = int(data[1])
-                win.addstr("\n #port: "+str(PORT))
-        elif data[0] == "#waitms":
-            if len(data) > 1:
-                win.addstr("\n #wait for: "+str(int(data[1])/1000.0)+"s")
-                EVENT.wait(timeout=int(data[1])/1000.0)
-        elif data[0] == "#wait":
-            if len(data) > 1:
-                time = int(float(data[1])*1000)
-                if len(data) > 2:
-                    time2 = int(float(data[2])*1000)
-                    time = random.randint(time,time2)
-                win.addstr("\n #wait for: "+str(time/1000.0)+"s")
-                EVENT.wait(timeout=time/1000.0)
-        elif data[0] == "#quit":
-            win.addstr("\n #quit")
-            return False
-        elif data[0] == "#loop":
-            win.addstr("\n #loop")
-            return True
-        elif data[0] == "#clearscreen":
-            win.clear()
-
-    # SENDING COMMANDS
-    elif line != '':
-        global CURRENTPL
-        send(line)
-        win.addstr("\n sent: "+line)
-
-        # STORE PL
-        if line == 'clear':
-            for d in IP: CURRENTPL[d] = []
-        elif line.startswith('text'):
-            for d in IP: CURRENTPL[d] = [(' ').join(line.split(' ')[2:])]
-        elif line.startswith('add'):
-            for d in IP: CURRENTPL[d].append((' ').join(line.split(' ')[2:]))
-
-    CONSOLE.append(line)
-
-
-def send(line):
-    global IP, PORT
-    for ip in IP:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        if ip.endswith('255'):
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.sendto(line.encode('utf-8'), (ip, PORT))
 
 
 def sendtoall(line):
@@ -157,67 +175,17 @@ def sendtoall(line):
     sock.sendto(line.encode('utf-8'), (BROADCAST, PORT))
 
 
-def header_win(win):
-    global TITREURS, IP
-    win.clear()
-    win.addstr("\n BEAUCOUP BEAUCOUP \n", curses.A_STANDOUT)
-    win.addstr("  Selected devices: ")
-    for k, d in enumerate(TITREURS):
-        mode = curses.A_STANDOUT if d in IP  else curses.A_BOLD
-        win.addstr(" ")
-        win.addstr(" "+str(k+1)+" ", mode)
-    win.addstr("\n\n\n")
-
-def console_win(win):
-    global CONSOLE
-    win.addstr("\n\n CONSOLE \n", curses.A_STANDOUT)
-    win.addstr("  "+("\n  ").join(CONSOLE))
-    win.addstr("\n\n")
-
-
-def home_win(win):
-    header_win(win)
-    win.addstr(" HOME \n", curses.A_STANDOUT)
-    win.addstr("\t0-9 for FX scenario \n\tINSER for playlist \n\tPAGEUP for freetext \n\tSUPPR to clear selected \n\tFIN to clearall \n\th for help \n\tESC to quit ")
-    # console_win(win)
-
-def manu_win(win, txt):
-    header_win(win)
-    win.addstr(" FREETEXT \n", curses.A_STANDOUT)
-    win.addstr("  Live typing - '/' second line of text\n\n")
-    win.addstr("  "+txt.replace('/','\n  '))
-    console_win(win)
-
-def playlist_win(win, txt):
-    global CURRENTPL
-    header_win(win)
-    win.addstr(" PLAYLIST \n", curses.A_STANDOUT)
-    for k, d in enumerate(TITREURS):
-        mode = curses.A_STANDOUT if d in IP  else curses.A_BOLD
-        win.addstr(" "+str(k+1)+" ", mode)
-        win.addstr("  "+(' | ').join(CURRENTPL[d]))
-        win.addstr("\n")
-
-    win.addstr("\n\n")
-    win.addstr(" ADD TEXT \n", curses.A_STANDOUT)
-    win.addstr("   "+txt.replace('/','\n    '))
-    win.addstr("\n")
-    console_win(win)
-
-def scene_win(win, num):
-    header_win(win)
-    win.addstr(" FX Scene: "+str(num)+" \n", curses.A_STANDOUT)
-    console_win(win)
-
 
 def main(win):
-    global IP, BROADCAST, TITREURS
+    global DEVICES, BROADCAST, TITREURS, PORT
 
-    scenarioThread = FuncThread(play_scenario, win)
     win.nodelay(True)
-    curses.resizeterm(50,100)
-    page = 'home'
-    home_win(win)
+    curses.resizeterm(100,200)
+
+    for ip in DEVICES:
+        TITREURS.append( Titreur(ip) )
+
+    page = 'scene'
     freetxt = ''
     playtxt = ''
 
@@ -225,144 +193,105 @@ def main(win):
         # try:
             key = win.getch()
 
-            #
-            # PAGE SELECT
-            #
-            if key == 262:  # HOME
-                page = 'home'
-                scenarioThread.stop()
-                home_win(win)
+            # if key == -1:
+            #     time.sleep(0.1)
+            #     continue
 
-            #PLAYLIST
-            elif key == 331: # INSER
-                page = 'playlist'
-                playtxt = ''
-                scenarioThread.stop()
-                IP = []
-                playlist_win(win, playtxt)
-                continue
-
-            # FREETEXT
-            elif key == 339: # PAGEUP
-                page = 'manu'
-                scenarioThread.stop()
-                freetxt = ''
-                IP = TITREURS.copy()
-                manu_win(win, freetxt)
-                continue
-
-            # SCENE FX
-            elif (page == 'home' or page == 'scene') and (key >= 48 and key <= 57):
-                page = 'scene'
-                scenarioThread.stop()
-                scenarioThread = FuncThread(play_scenario, win)
-                scenarioThread.scene(key-48)
+            # DEVICE SELECTOR
+            if key >= 265 and key <= 276:
+                if key == 276: # F12
+                    sel = [ti for ti in TITREURS if ti.selected]
+                    for t in TITREURS: t.selected = (len(sel) == 0)
+                elif key == 273: # F9
+                    for t in TITREURS: t.selected = not t.selected
+                else: # F1 -> F8
+                    k = key-265
+                    if k < len(DEVICES):
+                        for t in TITREURS:
+                            if t.ip == DEVICES[k]:
+                                t.selected = not t.selected
 
             # CLEARALL
-            elif key == 360: # END
-                sendtoall('clear')
+            elif key == 360 or key == 259: # END or ARROW UP
+                for t in TITREURS:
+                    if t.scene_val > 0: t.stop()
+                    t.clear()
 
             # CLEARSELECTED
             elif key == 330: # SUPPR
-                execute_cmd(win, 'clear')
+                for t in [ti for ti in TITREURS if ti.selected]:
+                    if t.scene_val > 0: t.stop()
+                    t.clear()
 
+            # MODE SCENE
+            elif key == 339 or key == 261: # PAGEUP or ARROW RIGHT
+                page = 'scene'
 
-            # DEVICE SELECTOR
-            elif key >= 265 and key <= 276:
-                if key == 276: # F12
-                    if len(IP) > 0: IP = []
-                    else: IP = TITREURS.copy()
-                else: # F1 -> F11
-                    sel = key-265
-                    if sel < len(TITREURS):
-                        if TITREURS[sel] in IP: IP.remove(TITREURS[sel])
-                        else: IP.append(TITREURS[sel])
+            # MODE FREETYPE
+            elif key == 262 or key == 258:  # HOME or ARROW DOWN
+                page = 'free'
+                freetxt = ''
+                for t in [ti for ti in TITREURS if ti.selected]:
+                    t.speed(0)
 
-
-
-            #
-            # HOME SPECIFIC
-            #
-            if page == 'home':
-
-                home_win(win)
-
-                # QUIT
-                if key == 27:
-                    break
-
-                # HELP
-                if key == ord('h'):
-                    win.clear()
-                    win.addstr("\n BEAUCOUP help: \n", curses.A_STANDOUT)
-                    win.addstr("\n   Destination: \n", curses.A_BOLD)
-                    win.addstr("      #to all            = broadcast \n")
-                    win.addstr("      #to 45 53 54       = send to titreur 45, 53 and 54 \n")
-                    win.addstr("      #ip 2.0.11.50      = send to 2.0.11.50 \n")
-                    win.addstr("      #port 3742         = change port (default 3742) \n")
-
-                    win.addstr("\n   Scenario: \n", curses.A_BOLD)
-                    win.addstr("      #wait 1.5          = pause for 1.5 s \n")
-                    win.addstr("      #waitms 1000       = pause for 1000 ms \n")
-                    win.addstr("      #loop              = restart from beggining \n")
-                    win.addstr("      #quit              = exit scenario \n")
-
-                    win.addstr("\n   Display text: \n", curses.A_BOLD)
-                    win.addstr("      text MODE blablba       = display \"blablba\" using MODE \n")
-                    win.addstr("      text MODE line1/line2   = display \"line1\" and \"line2\" using MODE \n")
-                    win.addstr("         Available Modes:\n")
-                    win.addstr("           NO_SCROLL_NORMAL\n")
-                    win.addstr("           SCROLL_NORMAL\n")
-                    win.addstr("           SCROLL_LOOP_NORMAL\n")
-                    win.addstr("           NO_SCROLL_BIG\n")
-                    win.addstr("           SCROLL_BIG\n")
-                    win.addstr("           SCROLL_LOOP_BIG\n")
-
-                    win.addstr("\n   Random playlist: \n", curses.A_BOLD)
-                    win.addstr("      clear              = empty playlist \n")
-                    win.addstr("      add MODE blabla    = add \"blabla\" with MODE to playlist \n")
-                    win.addstr("      speed 1000         = playlist next item in ms \n")
-                    win.addstr("      speed 1000 2000    = playlist next item in ms, random \n")
-
-                    win.addstr("\n   Misc: \n", curses.A_BOLD)
-                    win.addstr("      scroll 50          = scroll speed \n")
+            # MODE PLAYLIST
+            elif key == 331 or key == 260: # INSER or ARROW LEFT
+                page = 'play'
+                playtxt = ''
+                for t in [ti for ti in TITREURS if ti.selected]:
+                    t.speed(2000)
 
 
             #
-            # PLAYLIST
+            # DISPLAY
             #
-            if page == 'playlist':
-
-                # CHAR
-                if key >= 32 and key <= 168:
-                    playtxt += chr(key)
-                # BACKSPACE
-                elif key == 263:
-                    playtxt = playtxt[:-1]
-                # ENTER = add
-                elif key == 10:
-                    if playtxt.startswith('scroll') or playtxt.startswith('speed'):
-                        cmd = playtxt
-                    elif '/' in playtxt:
-                        if len(playtxt.split('/')[1]) < 9: cmd = 'add NO_SCROLL_NORMAL '+playtxt
-                        else: cmd = 'add SCROLL_LOOP_NORMAL '+playtxt
-                    else:
-                        if len(playtxt) < 9: cmd = 'add NO_SCROLL_BIG '+playtxt
-                        else: cmd = 'add SCROLL_LOOP_BIG '+playtxt
-                    execute_cmd(win, cmd)
-                    playtxt = ''
-
-                playlist_win(win, playtxt)
-
-
-
+            win.clear()
+            win.addstr("\n BEAUCOUP BEAUCOUP \n\n", curses.A_STANDOUT)
 
 
             #
-            # MANU
+            # DEVICES
             #
-            if page == 'manu':
+            win.addstr(" DEVICES \n\n", curses.A_STANDOUT)
+            for k, t in enumerate(TITREURS):
+                mode = curses.A_STANDOUT if t.selected else curses.A_BOLD
+                win.addstr(" ")
+                win.addstr(" "+str(k+1)+" ", mode)
+                win.addstr("  ")
 
+                if t.scene_val > 0:
+                    win.addstr("SCENE "+str(t.scene_val), curses.A_DIM)
+                else:
+                    win.addstr("speed "+str(t.speed_val[0])+" "+str(t.speed_val[1]), curses.A_DIM)
+
+                win.addstr("\t"+(' | ').join(t.currentPL))
+                win.addstr("\n      ")
+
+                if t.scene_val > 0:
+                    win.addstr(t.information, curses.A_DIM)
+                else:
+                    win.addstr("scroll "+str(t.scroll_val), curses.A_DIM)
+
+                win.addstr("\n\n")
+            win.addstr("\n")
+
+            #
+            # MODE SCENE
+            #
+            if page == 'scene':
+
+                if key >= 48 and key <= 57:
+                    fx = key-48
+                    for t in [ti for ti in TITREURS if ti.selected]:
+                        t.scene(fx)
+
+                win.addstr(" MODE SCENE FX \n", curses.A_STANDOUT)
+                win.addstr("   Select scene FX:  0 -> 9")
+
+            #
+            # MODE FREETYPE
+            #
+            if page == 'free':
                 cFt = freetxt
                 # CHAR
                 if key >= 32 and key <= 168:
@@ -375,15 +304,44 @@ def main(win):
                     freetxt = ''
 
                 if cFt != freetxt:
-                    if '/' in freetxt:
-                        if len(freetxt.split('/')[1]) < 9: cmd = 'text NO_SCROLL_NORMAL '+freetxt
-                        else: cmd = 'text SCROLL_LOOP_NORMAL '+freetxt
-                    else:
-                        if len(freetxt) < 9: cmd = 'text NO_SCROLL_BIG '+freetxt
-                        else: cmd = 'text SCROLL_LOOP_BIG '+freetxt
-                    execute_cmd(win, cmd)
+                    for t in [ti for ti in TITREURS if ti.selected]:
+                        if t.scene_val > 0: t.stop()
+                        if freetxt != '': t.text(freetxt)
+                        else: t.clear()
 
-                manu_win(win, freetxt)
+                win.addstr(" MODE FREE TYPE \n", curses.A_STANDOUT)
+                win.addstr("   Enter = clear for next \n")
+                win.addstr("   /     = second line\n\n")
+                win.addstr("   "+freetxt.replace("/", "\n   "))
+
+
+            #
+            # MODE PLAYLIST
+            #
+            if page == 'play':
+
+                # CHAR
+                if key >= 32 and key <= 168:
+                    playtxt += chr(key)
+                # BACKSPACE
+                elif key == 263:
+                    playtxt = playtxt[:-1]
+                # ENTER = add
+                elif key == 10:
+                    for t in [ti for ti in TITREURS if ti.selected]:
+                        if t.scene_val > 0: t.stop()
+                        if playtxt.startswith('#speed') or playtxt.startswith('<<'):
+                            data = playtxt.split(' ')
+                            if len(data) == 2: data.append(data[1])
+                            if len(data) > 1:
+                                t.speed(data[1], data[2])
+                        else: t.add(playtxt)
+                    playtxt = ''
+
+                win.addstr(" MODE PLAYLIST \n", curses.A_STANDOUT)
+                win.addstr("   Enter = add text to playlist \n")
+                win.addstr("   /     = second line\n\n")
+                win.addstr("   "+playtxt.replace("/", "\n   "))
 
 
             if key == -1: time.sleep(0.1)
