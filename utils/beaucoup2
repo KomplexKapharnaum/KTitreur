@@ -7,7 +7,7 @@ import time
 import socket
 
 BROADCAST = '2.0.255.255'
-DEVICES = ['2.0.11.44', '2.0.11.45', '2.0.11.48', '2.0.11.50', '2.0.11.51', '2.0.11.52', '127.0.0.1']
+DEVICES = ['2.0.11.44', '2.0.11.45', '2.0.11.48', '2.0.11.50', '2.0.11.51', '2.0.11.52']
 TITREURS = []
 PORT = 3742
 CONSOLE = []
@@ -18,7 +18,7 @@ def getMode(txt):
         if len(txt.split('/')[1]) < 9: return 'NO_SCROLL_NORMAL'
         else: return 'SCROLL_LOOP_NORMAL'
     else:
-        if len(txt) < 9: return 'NO_SCROLL_BIG'
+        if len(txt) < 13: return 'NO_SCROLL_BIG'
         else: return 'SCROLL_LOOP_BIG'
 
 
@@ -230,11 +230,15 @@ def main(win):
             elif key == 262:  # HOME
                 page = 'free'
                 freetxt = ''
+                for t in [ti for ti in TITREURS if ti.selected]:
+                    t.speed(0)
 
             # MODE PLAYLIST
             elif key == 331: # INSER
                 page = 'play'
                 playtxt = ''
+                for t in [ti for ti in TITREURS if ti.selected]:
+                    t.speed(2000)
 
 
             #
@@ -325,7 +329,7 @@ def main(win):
                 elif key == 10:
                     for t in [ti for ti in TITREURS if ti.selected]:
                         if t.scene_val > 0: t.stop()
-                        if playtxt.startswith('#speed'):
+                        if playtxt.startswith('#speed') or playtxt.startswith('<<'):
                             data = playtxt.split(' ')
                             if len(data) == 2: data.append(data[1])
                             if len(data) > 1:

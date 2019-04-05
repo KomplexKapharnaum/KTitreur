@@ -1,7 +1,9 @@
 #clear
-#speed 0
-#text ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ
+#speed 10
+#add   Ý RIOT Ý
+#add   _
 #quit
+
 
 
 

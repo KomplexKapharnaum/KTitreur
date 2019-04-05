@@ -1,12 +1,7 @@
-#speed 10
-#text BEAUCOUP
-#add ÍÍÍÍÍÍÍÍ
-
-#wait 0.3 0.8
-
-#speed 0
-#text BEAUCOUP
-
-#wait 1 5
-
-#loop
+#scroll 0
+#clear
+#speed 300
+#add   RENTRE
+#add      CHEZ
+#add      TOI
+#add    ON
