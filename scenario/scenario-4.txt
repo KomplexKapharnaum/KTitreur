@@ -1,0 +1,7 @@
+#clear
+#speed 100
+#add DE L'AMOUR Í
+#add  DE L'AMOUR
+#ad  DE L'AMOUR Í
+#add DE L'AMOUR
+#add DE L'AMOUR Í

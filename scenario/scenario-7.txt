@@ -1,0 +1,12 @@
+#speed 30
+#text    BEAUCOUP
+#add  ÍÍÍÍÍÍÍÍÍÍ
+
+#wait 0.3 1
+
+#speed 0
+#text   BEAUCOUP
+
+#wait 0.2 0.5
+
+#loop
