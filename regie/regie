@@ -1,10 +1,27 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import random
 import curses
 import os.path
 import threading
 import time
 import socket
+
+# ///////////////
+# import pandas as pd
+# from pandas import ExcelFile
+#
+# path = 'beaucoup.xlsx'
+# path = os.path.join( os.path.dirname(os.path.realpath(__file__)), '../scenario' , path )
+#
+# xl = pd.ExcelFile(path)
+# print(xl.sheet_names)
+#
+# df = xl.parse("Sheet1")
+# print(df.head())
+#
+#
+# exit()
+# ///////////////
 
 BROADCAST = '2.0.255.255'
 DEVICES = ['2.0.11.44', '2.0.11.45', '2.0.11.48', '2.0.11.50', '2.0.11.51', '2.0.11.52']
@@ -93,8 +110,8 @@ class ScenarioThread(threading.Thread):
 
 
     def run(self):
-        path = 'scenario-'+str(self._scene)+'.txt'
-        path = os.path.join( os.path.dirname(os.path.realpath(__file__)), '../scenario' , path )
+        path = 'fx-'+str(self._scene)+'.txt'
+        path = os.path.join( os.path.dirname(os.path.realpath(__file__)), '../fx' , path )
 
         if not os.path.exists(path):
             self._titreur.info("ERROR: File "+path+" not found")
