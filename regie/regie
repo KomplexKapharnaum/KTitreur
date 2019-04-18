@@ -38,7 +38,8 @@ class Titreur():
 
     def send(self, cmd):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(cmd.encode('utf-8'), (self.ip, self.port))
+        try: sock.sendto(cmd.encode('utf-8'), (self.ip, self.port))
+        except: pass
 
     def clear(self):
         self.currentPL = []
@@ -93,7 +94,7 @@ class ScenarioThread(threading.Thread):
 
     def run(self):
         path = 'scenario-'+str(self._scene)+'.txt'
-        path = os.path.join( os.path.dirname(os.path.realpath(__file__)), path )
+        path = os.path.join( os.path.dirname(os.path.realpath(__file__)), '../scenario' , path )
 
         if not os.path.exists(path):
             self._titreur.info("ERROR: File "+path+" not found")
@@ -180,7 +181,13 @@ def main(win):
     global DEVICES, BROADCAST, TITREURS, PORT
 
     win.nodelay(True)
+    win.scrollok(1)
+    win.keypad(1)
+    curses.initscr()
+    curses.cbreak()
+    curses.noecho()
     curses.resizeterm(100,200)
+    curses.curs_set(0)
 
     for ip in DEVICES:
         TITREURS.append( Titreur(ip) )
@@ -347,6 +354,9 @@ def main(win):
             if key == -1: time.sleep(0.1)
             else: win.addstr("\n\n"+str(key))
 
+
+            curses.doupdate()
+            curses.curs_set(0)
 
 
 
