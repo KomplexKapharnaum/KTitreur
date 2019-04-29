@@ -35,11 +35,11 @@ udp.on('tick',      texts.pick)
 
 
 # DEFAULT BEHAVIOUR
-texts.add( (" beaucoup / beaucoup", 'NO_SCROLL_NORMAL') )
-texts.add( ("beaucoup beaucoup", 'NO_SCROLL_BIG') )
-texts.add( ("           beaucoup /     beaucoup", 'SCROLL_LOOP_NORMAL') )
-texts.add( ("    beaucoup beaucoup", 'SCROLL_LOOP_BIG') )
-texts.autoPick(2000)
+texts.add( (" beaucoup ", 'NO_SCROLL_BIG') )
+#texts.add( (" beaucoup / beaucoup", 'NO_SCROLL_NORMAL') )
+#texts.add( ("           beaucoup /     beaucoup", 'SCROLL_LOOP_NORMAL') )
+#texts.add( ("    beaucoup beaucoup", 'SCROLL_LOOP_BIG') )
+#texts.autoPick(2000)
 
 # LOOP
 while RUN:
