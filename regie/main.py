@@ -322,12 +322,12 @@ def main(win):
             #
             if page == 'free':
                 cFt = freetxt
-                # CHAR
-                if key >= 32 and key <= 168:
-                    freetxt += chr(key)
                 # BACKSPACE
-                elif key == 263:
+                if key == 263 or key == 127:
                     freetxt = freetxt[:-1]
+                # CHAR
+                elif key >= 32 and key <= 168:
+                    freetxt += chr(key)
                 # ENTER = clear
                 elif key == 10:
                     freetxt = ''
@@ -350,16 +350,16 @@ def main(win):
             if page == 'play':
 
                 # CHAR
-                if key >= 32 and key <= 168:
-                    playtxt += chr(key)
                 # BACKSPACE
-                elif key == 263:
+                if key == 263 or key == 127:
                     playtxt = playtxt[:-1]
+                elif key >= 32 and key <= 168:
+                    playtxt += chr(key)
                 # ENTER = add
                 elif key == 10:
                     for t in [ti for ti in TITREURS if ti.selected]:
                         if t.scene_val > 0: t.stop()
-                        if playtxt.startswith('#speed') or playtxt.startswith('<<'):
+                        if playtxt.startswith('#speed') or playtxt.startswith('<<') or playtxt.startswith('>>'):
                             data = playtxt.split(' ')
                             if len(data) == 2: data.append(data[1])
                             if len(data) > 1:
