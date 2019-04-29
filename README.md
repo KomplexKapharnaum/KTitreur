@@ -5,7 +5,7 @@ Run client on Titreur:
 `python ./titreur/main.py [UDP port = 3742]`
 
 Run controller on Desktop:
-`./regie/regie`
+`./regie`
 
 UDP messages:
 - clear
