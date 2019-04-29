@@ -1,8 +1,11 @@
 # KTitreur
 KXKM Titreurs
 
-Start with
-`python main.py [UDP port = 3742]`
+Run client on Titreur: 
+`python ./titreur/main.py [UDP port = 3742]`
+
+Run controller on Desktop:
+`./regie/regie`
 
 UDP messages:
 - clear

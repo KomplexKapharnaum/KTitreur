@@ -54,9 +54,11 @@ class Titreur():
         self.information = ''
 
     def send(self, cmd):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try: sock.sendto(cmd.encode('utf-8'), (self.ip, self.port))
-        except: pass
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(cmd.encode('utf-8'), (self.ip, self.port))
+        except:
+            print("UDP send error")
 
     def clear(self):
         self.currentPL = []
@@ -188,10 +190,12 @@ class ScenarioThread(threading.Thread):
 
 def sendtoall(line):
     global BROADCAST, PORT
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    sock.sendto(line.encode('utf-8'), (BROADCAST, PORT))
-
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.sendto(line.encode('utf-8'), (BROADCAST, PORT))
+    except:
+        print("UDP broadcast error")
 
 
 def main(win):
