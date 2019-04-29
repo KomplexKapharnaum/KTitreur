@@ -1,17 +1,18 @@
-#!/usr/bin/env python
+
 import random
 import curses
 import os.path
 import threading
 import time
 import socket
+import subprocess
 
 # ///////////////
 # import pandas as pd
 # from pandas import ExcelFile
 #
 # path = 'beaucoup.xlsx'
-# path = os.path.join( os.path.dirname(os.path.realpath(__file__)), 'scenario' , path )
+# path = os.path.join( os.path.dirname(os.path.realpath(__file__)), '../scenario' , path )
 #
 # xl = pd.ExcelFile(path)
 # print(xl.sheet_names)
@@ -113,7 +114,7 @@ class ScenarioThread(threading.Thread):
 
     def run(self):
         path = 'fx-'+str(self._scene)+'.txt'
-        path = os.path.join( os.path.dirname(os.path.realpath(__file__)), 'fx' , path )
+        path = os.path.join( os.path.dirname(os.path.realpath(__file__)), '../fx' , path )
 
         if not os.path.exists(path):
             self._titreur.info("ERROR: File "+path+" not found")
@@ -384,5 +385,6 @@ def main(win):
         # except Exception as e:
         #    # No input
         #    pass
+
 
 curses.wrapper(main)
