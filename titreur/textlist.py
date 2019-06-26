@@ -69,7 +69,7 @@ class Textlist(EventEmitter):
         for item in lst:
             self.add(item)
         p = self.pick()
-        print("show ", p)
+        # print("show ", p)
 
 
     # Auto pick

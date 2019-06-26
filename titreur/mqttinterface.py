@@ -15,7 +15,7 @@ def on_subscribe(client, userdata, mid, granted_qos):
     print("MQTT: subscribed", userdata, mid, granted_qos)
 
 def on_message(client, userdata, message):
-    print("MQTT: Received message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
+    # print("MQTT: Received message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
     command  = message.topic.split('/')[1:]
     args = message.payload.decode().split('§')
     userdata.emit(command[0], tuple(args))
