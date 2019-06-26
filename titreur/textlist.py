@@ -8,10 +8,11 @@ class Textlist(EventEmitter):
     def __init__(self):
         super().__init__()
         self.texts = []
-        self.last = None
+        self.lastKey = -1
         self.timer = Timer(0, self.pick)
         self.minInterval = 0
         self.maxInterval = 0
+        self.random = False
 
     # PICK FROM LIST (avoid last item)
     def pick(self):
@@ -19,14 +20,22 @@ class Textlist(EventEmitter):
 
         item = None
         if len(self.texts) == 1:
-            item = self.texts[0]
+            self.lastKey = 0
         elif len(self.texts) > 1:
-            while True:
-                it = random.choice(self.texts)
-                if it != self.last:
-                    item = it
-                    break
-        self.last = item
+            if self.random:
+                while True:
+                    k = random.randrange(len(self.texts))
+                    if k != self.lastKey:
+                        self.lastKey = k
+                        break
+            else:
+                self.lastKey += 1
+                if self.lastKey >= len(self.texts): 
+                    self.lastKey = 0
+        
+        if len(self.texts) > 0:
+            item = self.texts[self.lastKey]        
+        
         self.emit('pick', item)
 
         if self.minInterval > 0:
@@ -39,6 +48,7 @@ class Textlist(EventEmitter):
 
     # Clear list
     def clear(self, now=True):
+        # print("CLEAR")
         self.texts = []
         if now:
             self.pick()
@@ -58,7 +68,8 @@ class Textlist(EventEmitter):
         self.clear(False)
         for item in lst:
             self.add(item)
-        self.pick()
+        p = self.pick()
+        print("show ", p)
 
 
     # Auto pick
