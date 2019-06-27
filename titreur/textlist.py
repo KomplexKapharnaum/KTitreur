@@ -15,11 +15,13 @@ class Textlist(EventEmitter):
         self.random = False
 
     # PICK FROM LIST (avoid last item)
-    def pick(self):
+    def pick(self, index=-1):
         self.timer.cancel()
-
         item = None
-        if len(self.texts) == 1:
+
+        if index >= 0 and index < len(self.texts):
+            self.lastKey = index
+        elif len(self.texts) == 1:
             self.lastKey = 0
         elif len(self.texts) > 1:
             if self.random:
@@ -59,6 +61,7 @@ class Textlist(EventEmitter):
         if not isinstance(item, tuple):
             item = (item, None)
         self.texts.append( item )
+        self.pick( len(self.texts)-1 )
 
     # remove from list
     def rm(self, item):
