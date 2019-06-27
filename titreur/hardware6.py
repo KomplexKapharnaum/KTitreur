@@ -9,7 +9,7 @@ class Hardware6(EventEmitter):
     def __init__(self, binarypath):
         super().__init__()
 
-        self.currentTxt = ""
+        self.currentTxtCmd = ""
 
         my_path = os.path.abspath(os.path.dirname(__file__))
         self.binarypath =  os.path.join(my_path, binarypath)
