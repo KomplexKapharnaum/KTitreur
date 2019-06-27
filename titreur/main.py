@@ -43,12 +43,12 @@ mqtt.on('rm',        texts.rm)
 mqtt.on('text',      texts.set)
 mqtt.on('tick',      texts.pick)
 
-# DEFAULT BEHAVIOUR
-texts.set( (" BEAUCOUP ", 'NO_SCROLL_BIG') )
+# STARTUP BEHAVIOUR
+hw.text( (" BEAUCOUP ", 'NO_SCROLL_BIG') )
 #texts.add( (" beaucoup / beaucoup", 'NO_SCROLL_NORMAL') )
 #texts.add( ("           beaucoup /     beaucoup", 'SCROLL_LOOP_NORMAL') )
 #texts.add( ("    beaucoup beaucoup", 'SCROLL_LOOP_BIG') )
-#texts.autoPick(2000)
+texts.autoPick(500)
 
 # LOOP
 while RUN:

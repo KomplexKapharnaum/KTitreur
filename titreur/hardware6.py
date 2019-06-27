@@ -9,6 +9,8 @@ class Hardware6(EventEmitter):
     def __init__(self, binarypath):
         super().__init__()
 
+        self.currentTxt = ""
+
         my_path = os.path.abspath(os.path.dirname(__file__))
         self.binarypath =  os.path.join(my_path, binarypath)
         self.running = False
@@ -120,8 +122,10 @@ class Hardware6(EventEmitter):
         cmd += ' -type ' + mode
         cmd += ' -speed ' + str(self.speed)
         cmd += '\n'
-
-        self.send(cmd)
+        
+        if self.currentTxtCmd != cmd:
+            self.currentTxtCmd = cmd
+            self.send(cmd)
 
 
     # Set text scroll speed

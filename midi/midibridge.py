@@ -144,7 +144,7 @@ class MidiInterface():
 
 if __name__ == '__main__':
     xls = XlsParser("MidiMapping.xls")
-    midiIN = MidiInterface("Ktitreur-Midi", "127.0.0.1", xls)
+    midiIN = MidiInterface("Ktitreur-Midi", "2.0.0.1", xls)
 
 
     def signal_handler(sig, frame):
