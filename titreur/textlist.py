@@ -60,6 +60,12 @@ class Textlist(EventEmitter):
             item = (item, None)
         self.texts.append( item )
 
+    # remove from list
+    def rm(self, txt):
+        if txt in 
+        if not isinstance(item, tuple):
+            item = (item, None)
+        self.texts.append( item )
 
     # set entire list
     def set(self, lst):
@@ -69,7 +75,7 @@ class Textlist(EventEmitter):
         for item in lst:
             self.add(item)
         p = self.pick()
-        print("show ", p)
+        # print("show ", p)
 
 
     # Auto pick
