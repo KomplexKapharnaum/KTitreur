@@ -32,7 +32,9 @@ class XlsParser():
         # C1 = 24 // C2 = 36
         colx = (note//12)-1 
         rowx = self.offset + (note%12) + 1
-        return self.worksheet.cell_value( rowx, colx )
+        value = self.worksheet.cell_value( rowx, colx )
+        print('Parser:', value)
+        return value
 
 
 #
@@ -89,6 +91,9 @@ class MidiMessage():
     def systype(self):
         return MIDISYS[self.channel]
 
+    def subtype(self):
+        return  self.channel if (self.maintype() != 'SYSTEM') else self.systype()
+
     def payload_raw(self):
         return self.maintype() + ' ' + self.channel + '/' + '-'.join([str(v).zfill(3) for v in self.values ])+'§NO_SCROLL_NORMAL'
     
@@ -104,6 +109,8 @@ class MidiToMQTTHandler(object):
         msg, deltatime = event
         self._wallclock += deltatime
         mm = MidiMessage(msg)
+
+        print('MIDI:', mm.maintype(), mm.subtype(), mm.values  )
 
         if mm.maintype() == 'NOTEON':
             txt = self._parser.note2txt( mm.values[0] ) 
@@ -137,7 +144,7 @@ class MidiInterface():
 
 if __name__ == '__main__':
     xls = XlsParser("MidiMapping.xls")
-    midiIN = MidiInterface("Ktitreur-Midi", "2.0.0.1", xls)
+    midiIN = MidiInterface("Ktitreur-Midi", "127.0.0.1", xls)
 
 
     def signal_handler(sig, frame):
