@@ -1,0 +1,14 @@
+cd Ktitreur
+kxkm_fs_root_rw
+date -s "2019-06-26"
+git stash
+git pull
+systemctl stop ktitreur
+systemctl disable ktitreur
+rm /etc/systemd/system/ktitreur.service
+pip install paho-mqtt
+cp /root/KTitreur/titreur/ktitreur.service /etc/systemd/system/ktitreur.service
+systemctl enable ktitreur
+systemctl start ktitreur
+----
+
