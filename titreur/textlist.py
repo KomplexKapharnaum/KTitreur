@@ -39,12 +39,16 @@ class Textlist(EventEmitter):
             item = self.texts[self.lastKey]        
         
         self.emit('pick', item)
-
+        
+        if len(self.texts) <= 1:
+            return
+            
         if self.minInterval > 0:
             next = random.randint(self.minInterval,self.maxInterval)/1000.0
             self.timer = Timer(next, self.pick)
             self.timer.start()
-
+        
+        print('PICK')
         return item
 
 
@@ -89,10 +93,12 @@ class Textlist(EventEmitter):
     # Auto pick
     def autoPick(self, minInterval, maxInterval=None):
         if isinstance(minInterval, tuple):
-            maxInterval = minInterval[1]
-            minInterval = minInterval[0]
+            if len(minInterval) > 1: 
+                maxInterval = int(minInterval[1])
+            minInterval = int(minInterval[0])
         if not maxInterval:
             maxInterval = minInterval
         self.minInterval = int(minInterval)
         self.maxInterval = int(maxInterval)
+        # print('Pick speed', self.minInterval, self.maxInterval)
         self.pick()
