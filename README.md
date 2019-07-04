@@ -1,5 +1,5 @@
 # KTitreur
-KXKM Titreurs
+## KXKM Titreurs
 
 Run client on Titreur:
 `python ./titreur/main.py [UDP port = 3742]`
@@ -30,3 +30,19 @@ Mode PLAYLIST:
 - Type and Enter to add text to Titreurs playlist
 - Playlist items are rotated randomly with random delay (min, max) called speed in milliseconds
 - Send `>> 1000` to change text rotation speed to i.e. 1000ms
+
+
+## MIDI BRIDGE
+
+Run client on Desktop
+`./midi-start 2.0.0.1`
+
+
+****
+TODO
+****
+
+- Debraye MIDI / REGIE ?? 127 -> clear + manu ok
+- upgrade RPi MESH
+- upgrade Titreurs !
+
