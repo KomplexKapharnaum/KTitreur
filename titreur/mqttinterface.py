@@ -36,7 +36,7 @@ class Mqttinterface(EventEmitter):
         self.client = mqtt.Client(userdata=self)
         self.client.connect("2.0.0.1")
         self.client.subscribe("titreur/all/#", 2)
-        self.client.subscribe("titreur/#", 2)
+        self.client.subscribe("titreur/"+str(id)+"/#", 2)
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
         self.client.on_subscribe = on_subscribe
