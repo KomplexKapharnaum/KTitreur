@@ -32,17 +32,4 @@ Mode PLAYLIST:
 - Send `>> 1000` to change text rotation speed to i.e. 1000ms
 
 
-## MIDI BRIDGE
-
-Run client on Desktop
-`./midi-start 2.0.0.1`
-
-
-****
-TODO
-****
-
-- Debraye MIDI / REGIE ?? 127 -> clear + manu ok
-- upgrade RPi MESH
-- upgrade Titreurs !
 

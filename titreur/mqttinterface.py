@@ -27,8 +27,15 @@ class Mqttinterface(EventEmitter):
     def __init__(self, addr):
         super().__init__()
 
+        id = 0
+        with open('/root/id') as f:
+            id = f.read()
+        
+        print('ID: ', id)
+
         self.client = mqtt.Client(userdata=self)
         self.client.connect("2.0.0.1")
+        self.client.subscribe("titreur/all/#", 2)
         self.client.subscribe("titreur/#", 2)
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
