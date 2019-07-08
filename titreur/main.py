@@ -44,7 +44,7 @@ mqtt.on('text',      texts.set)
 mqtt.on('tick',      texts.pick)
 
 # STARTUP BEHAVIOUR
-hw.text( (" BEAUCOUP ", 'NO_SCROLL_BIG') )
+texts.set( ("  BEAUCOUP ", 'NO_SCROLL_BIG') )
 #texts.add( (" beaucoup / beaucoup", 'NO_SCROLL_NORMAL') )
 #texts.add( ("           beaucoup /     beaucoup", 'SCROLL_LOOP_NORMAL') )
 #texts.add( ("    beaucoup beaucoup", 'SCROLL_LOOP_BIG') )
