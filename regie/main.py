@@ -56,7 +56,11 @@ class Titreur():
         if cmds[0] == 'add' or cmds[0] == 'text':
             args = reversed(args)
         txt = "§".join(args)
-        mqttc.publish('titreur/'+str(self.id)+'/'+cmds[0], payload=txt, qos=1, retain=False)
+        if self.ip == 'webapp':
+            dest = 'webapp'
+        else:
+            dest = str(self.id)
+        mqttc.publish('titreur/'+dest+'/'+cmds[0], payload=txt, qos=1, retain=False)
 
     def clear(self):
         self.currentPL = []
@@ -253,11 +257,11 @@ def main(win):
                     t.clear()
 
             # MODE SCENE
-            elif key == 339 or key == 444: # PAGEUP or CTRL + ARROW RIGHTa
+            elif key == 339 or key == 444 or key == 560: # PAGEUP or CTRL + ARROW RIGHTa
                 page = 'scene'
 
             # MODE FREETYPE
-            elif key == 262 or key == 481:  # HOME or CTRL + ARROW DOWN
+            elif key == 262 or key == 481 or key == 525:  # HOME or CTRL + ARROW DOWN
                 page = 'free'
                 freetxt = ''
                 poscursor = 0
@@ -265,7 +269,7 @@ def main(win):
                     t.speed(0)
 
             # MODE PLAYLIST
-            elif key == 331 or key == 443: # INSER or CTRL + ARROW LEFT
+            elif key == 331 or key == 443 or key == 545: # INSER or CTRL + ARROW LEFT
                 page = 'play'
                 playtxt = ''
                 poscursor = 0
