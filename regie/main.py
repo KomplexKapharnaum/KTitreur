@@ -211,7 +211,7 @@ def main(win):
     curses.initscr()
     curses.cbreak()
     curses.noecho()
-    curses.resize_term(100,200)
+    curses.resize_term(100,100)
     curses.curs_set(0)
 
     for ip in DEVICES:
@@ -245,7 +245,7 @@ def main(win):
                                 t.selected = not t.selected
 
             # CLEARALL
-            elif key == 360 or key == 259 or key == 27: # END or ARROW UP OR ESC
+            elif key == 360 or key == 27: # END  OR ESC
                 for t in TITREURS:
                     if t.scene_val > 0: t.stop()
                     t.clear()
@@ -257,11 +257,11 @@ def main(win):
                     t.clear()
 
             # MODE SCENE
-            elif key == 339 or key == 444 or key == 560: # PAGEUP or CTRL + ARROW RIGHTa
+            elif key == 338 or key == 444 or key == 560: # PAGEDOWN or CTRL + ARROW RIGHTa
                 page = 'scene'
 
             # MODE FREETYPE
-            elif key == 262 or key == 481 or key == 525:  # HOME or CTRL + ARROW DOWN
+            elif key == 339 or key == 481 or key == 525:  # PAGEUP or CTRL + ARROW DOWN
                 page = 'free'
                 freetxt = ''
                 poscursor = 0
@@ -269,7 +269,7 @@ def main(win):
                     t.speed(0)
 
             # MODE PLAYLIST
-            elif key == 331 or key == 443 or key == 545: # INSER or CTRL + ARROW LEFT
+            elif key == 262 or key == 443 or key == 545: # HOME or CTRL + ARROW LEFT
                 page = 'play'
                 playtxt = ''
                 poscursor = 0
@@ -367,7 +367,7 @@ def main(win):
                         win.addstr("° ")
                     else:
                         win.addstr("| ")
-                # win.addstr("\n   | | | | | | | | | | | |")
+                win.addstr("\n   1 2 3 4 5 6 7 8 9 0 1 2")
 
 
             #
@@ -379,10 +379,12 @@ def main(win):
                 # BACKSPACE
                 if key == 263 or key == 127 or key == 8:
                     playtxt = playtxt[:-1]
-                    poscursor -= 1
+                    if poscursor > 0:
+                        poscursor -= 1
                 elif key >= 32 and key <= 168:
                     playtxt += chr(key)
-                    poscursor += 1
+                    if poscursor < len(playtxt):
+                        poscursor += 1
                 # ENTER = add
                 elif key == 10:
                     for t in [ti for ti in TITREURS if ti.selected]:
@@ -405,7 +407,7 @@ def main(win):
                         win.addstr("° ")
                     else:
                         win.addstr("| ")
-                # win.addstr("\n   | | | | | | | | | | | |")
+                win.addstr("\n   1 2 3 4 5 6 7 8 9 0 1 2")
 
 
             if key == -1: time.sleep(0.1)
