@@ -8,13 +8,13 @@ Run controller on Desktop:
 `./regie-start`
 
 MAIN REGIE keyboard controller:
-- Arrow RIGHT / PageUp  = Mode Fx
-- Arrow DOWN  / Home    = Mode FreeType
-- Arrow LEFT  / Insert  = Mode Playlist
-- Arrow UP    / End     = Clear All
-- F1 - F8               = Select Titreur
-- F9                    = Inverse selection
-- F12                   = Select All / None
+- CTRL + Arrow RIGHT / PageUp  = Mode Fx
+- CTRL + Arrow DOWN  / Home    = Mode FreeType
+- CTRL + Arrow LEFT  / Insert  = Mode Playlist
+- Arrow UP    / End             = Clear All
+- F1 - F8                       = Select Titreur
+- F9                            = Inverse selection
+- F12                           = Select All / None
 
 
 Mode FX:
@@ -28,8 +28,8 @@ Mode FREETYPE:
 
 Mode PLAYLIST:
 - Type and Enter to add text to Titreurs playlist
-- Playlist items are rotated randomly with random delay (min, max) called speed in milliseconds
-- Send `>> 1000` to change text rotation speed to i.e. 1000ms
+- Playlist items are rotated randomly with delay called speed in milliseconds
+- Send `>1000` to change text rotation speed to i.e. 1000ms
 
 
 
