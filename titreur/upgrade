@@ -1,4 +1,4 @@
-cd Ktitreur
+cd KTitreur
 kxkm_fs_root_rw
 date -s "2019-06-26"
 git stash
