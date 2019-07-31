@@ -30,3 +30,7 @@ Mode PLAYLIST:
 - Type and Enter to add text to Titreurs playlist
 - Playlist items are rotated randomly with random delay (min, max) called speed in milliseconds
 - Send `>> 1000` to change text rotation speed to i.e. 1000ms
+
+RETOUR USER : 
+Séparer dans le mode Freetype le scroll et le texte fixe en 2 modes distincts. 
+
