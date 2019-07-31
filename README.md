@@ -1,5 +1,5 @@
 # KTitreur
-KXKM Titreurs
+## KXKM Titreurs
 
 Run client on Titreur:
 `python ./titreur/main.py [UDP port = 3742]`
@@ -8,13 +8,13 @@ Run controller on Desktop:
 `./regie-start`
 
 MAIN REGIE keyboard controller:
-- Arrow RIGHT / PageUp  = Mode Fx
-- Arrow DOWN  / Home    = Mode FreeType
-- Arrow LEFT  / Insert  = Mode Playlist
-- Arrow UP    / End     = Clear All
-- F1 - F8               = Select Titreur
-- F9                    = Inverse selection
-- F12                   = Select All / None
+- CTRL + Arrow RIGHT / PageUp  = Mode Fx
+- CTRL + Arrow DOWN  / Home    = Mode FreeType
+- CTRL + Arrow LEFT  / Insert  = Mode Playlist
+- Arrow UP    / End             = Clear All
+- F1 - F8                       = Select Titreur
+- F9                            = Inverse selection
+- F12                           = Select All / None
 
 
 Mode FX:
@@ -33,4 +33,6 @@ Mode PLAYLIST:
 
 RETOUR USER : 
 Séparer dans le mode Freetype le scroll et le texte fixe en 2 modes distincts. 
+- Playlist items are rotated randomly with delay called speed in milliseconds
+- Send `>1000` to change text rotation speed to i.e. 1000ms
 
