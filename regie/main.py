@@ -1,4 +1,4 @@
-
+﻿
 import random
 import curses
 import os.path
@@ -211,7 +211,7 @@ def main(win):
     curses.initscr()
     curses.cbreak()
     curses.noecho()
-    curses.resize_term(100,100)
+    curses.resize_term(130,130)
     curses.curs_set(0)
 
     for ip in DEVICES:
