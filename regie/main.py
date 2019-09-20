@@ -217,7 +217,8 @@ def main(win):
     for ip in DEVICES:
         TITREURS.append( Titreur(ip) )
 
-    page = 'scene'
+    showHelp = False
+    page = 'play'
     freetxt = ''
     playtxt = ''
     poscursor = 0
@@ -237,13 +238,15 @@ def main(win):
                     for t in TITREURS: t.selected = (len(sel) == 0)
                 elif key == 273: # F9
                     for t in TITREURS: t.selected = not t.selected
+                elif key == 274:  # F10
+                    showHelp = not showHelp
                 else: # F1 -> F8
                     k = key-265
                     if k < len(DEVICES):
                         for t in TITREURS:
                             if t.ip == DEVICES[k]:
                                 t.selected = not t.selected
-
+            
             # CLEARALL
             elif key == 360 or key == 27: # END  OR ESC
                 for t in TITREURS:
@@ -297,7 +300,7 @@ def main(win):
                 if t.scene_val > 0:
                     win.addstr("SCENE "+str(t.scene_val), curses.A_DIM)
                 else:
-                    win.addstr("speed "+str(t.speed_val[0])+" "+str(t.speed_val[1]), curses.A_DIM)
+                    win.addstr("[speed "+str(t.speed_val[0])+"]", curses.A_DIM)
 
                 win.addstr("\t"+(' | ').join(t.currentPL))
                 win.addstr("\n      ")
@@ -305,7 +308,12 @@ def main(win):
                 if t.scene_val > 0:
                     win.addstr(t.information, curses.A_DIM)
                 else:
-                    win.addstr("scroll "+str(t.scroll_val), curses.A_DIM)
+                    idi = t.ip.split('.')
+                    if len(idi) >= 4: idi = "id ."+idi[3] 
+                    else: idi = t.ip
+                    win.addstr("- "+idi)
+                # else:
+                #     win.addstr("scroll "+str(t.scroll_val), curses.A_DIM)
 
                 win.addstr("\n\n")
             win.addstr("\n")
@@ -388,10 +396,17 @@ def main(win):
                 elif key == 10:
                     for t in [ti for ti in TITREURS if ti.selected]:
                         if t.scene_val > 0: t.stop()
-                        # SPEED
+                        # SCROLL SPEED
                         if playtxt.startswith('<') or playtxt.startswith('>'):
                             data = playtxt[1:]
-                            t.speed(data, data)
+                            # SCROLL
+                            if data.startswith('<') or data.startswith('>'):
+                                data = data[1:].strip().split(' ')[0]
+                                t.scroll(data)
+                            # SPEED
+                            else:
+                                data = data.strip().split(' ')[0]
+                                t.speed(data, data)
                         else: t.add(playtxt)
                     playtxt = ''
                     poscursor = 0
@@ -407,8 +422,9 @@ def main(win):
                 win.addstr(" MODE PLAYLIST \n", curses.A_STANDOUT)
                 win.addstr("   Enter = add text to playlist \n")
                 win.addstr("   /     = second line\n")
-                win.addstr("   >500  = time change (ms)\n\n")
-                win.addstr("   "+" ".join(playtxt.replace("/", "\n   ")))
+                win.addstr("   >500  = change speed (ms)\n")
+                # win.addstr("   >> 100  = scroll speed \n")
+                win.addstr("\n   "+" ".join(playtxt.replace("/", "\n   ")))
                 win.addstr("\n   ")
                 for k in range(12):
                     if poscursor == k:
@@ -421,6 +437,27 @@ def main(win):
             if key == -1: time.sleep(0.1)
             else: win.addstr("\n\n"+str(key))
 
+            #
+            # HELP
+            #
+            if showHelp:
+                win.addstr(" \n\n\n\n")
+                win.addstr(" CONTROLS \n", curses.A_STANDOUT)
+                win.addstr("   fn+left \t= PLAYLIST mode \n")
+                win.addstr("   fn+up \t= FREE TYPE mode \n")
+                win.addstr("   fn+down \t= SCENE FX mode \n")
+                win.addstr(" \n")
+                win.addstr("   F1-F8 \t= SELECT Device (toggle) \n")
+                win.addstr("   F9 \t\t= INVERT Selection \n")
+                win.addstr("   F12 \t\t= SELECT None / All \n")
+                win.addstr(" \n")
+                win.addstr("   esc \t\t= CLEAR All \n")
+                win.addstr("   suppr \t= CLEAR Selected \n")
+                win.addstr(" \n")
+                win.addstr("   NB: To send channel 8 to WebApp you must start K32-Bridge\n")
+            else:
+                win.addstr(" \n\n\n\n")
+                win.addstr("   press F10 to display controls ... \n")
 
             curses.doupdate()
             curses.curs_set(0)
