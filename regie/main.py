@@ -330,9 +330,9 @@ def main(win):
                 cFt = freetxt
                 # BACKSPACE
                 if key == 263 or key == 127 or key == 8:
-                    # freetxt = freetxt[:-1]
-                    freetxt = freetxt[0 : poscursor-1 : ] + freetxt[poscursor : :]
-                    poscursor -= 1
+                    if poscursor > 0:
+                        freetxt = freetxt[0 : poscursor-1 : ] + freetxt[poscursor : :]
+                        poscursor -= 1
                 # CHAR
                 elif key >= 32 and key <= 168:
                     freetxt = freetxt[:poscursor] + chr(key) + freetxt[poscursor:]
@@ -378,13 +378,12 @@ def main(win):
                 # CHAR
                 # BACKSPACE
                 if key == 263 or key == 127 or key == 8:
-                    playtxt = playtxt[:-1]
                     if poscursor > 0:
+                        playtxt = playtxt[0 : poscursor-1 : ] + playtxt[poscursor : :]
                         poscursor -= 1
                 elif key >= 32 and key <= 168:
-                    playtxt += chr(key)
-                    if poscursor < len(playtxt):
-                        poscursor += 1
+                    playtxt = playtxt[:poscursor] + chr(key) + playtxt[poscursor:]
+                    poscursor += 1
                 # ENTER = add
                 elif key == 10:
                     for t in [ti for ti in TITREURS if ti.selected]:
@@ -396,10 +395,19 @@ def main(win):
                         else: t.add(playtxt)
                     playtxt = ''
                     poscursor = 0
+                # LEFT = move cursor
+                elif key == 260:
+                    if poscursor > 0: 
+                        poscursor -= 1
+                # RIGHT = move cursor
+                elif key == 261:
+                    if poscursor < len(playtxt): 
+                        poscursor += 1
 
                 win.addstr(" MODE PLAYLIST \n", curses.A_STANDOUT)
                 win.addstr("   Enter = add text to playlist \n")
-                win.addstr("   /     = second line\n\n")
+                win.addstr("   /     = second line\n")
+                win.addstr("   >500  = time change (ms)\n\n")
                 win.addstr("   "+" ".join(playtxt.replace("/", "\n   ")))
                 win.addstr("\n   ")
                 for k in range(12):
