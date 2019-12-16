@@ -147,8 +147,8 @@ class Hardware6(EventEmitter):
         RGB = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
         cmd = 'setlight'
         cmd += ' -rgb ' + str(RGB[0]) +' '+ str(RGB[1]) +' '+ str(RGB[2]) 
-        if (fade > 0)       cmd += ' -fade ' + str(fade)
-        if (strobe > 0)     cmd += ' -strob ' + str(strobe)
+        if (fade > 0):       cmd += ' -fade ' + str(fade)
+        if (strobe > 0):     cmd += ' -strob ' + str(strobe)
         cmd += '\n'
 
         if self.currentTxtCmd != cmd:
