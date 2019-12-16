@@ -110,18 +110,26 @@ class Hardware6(EventEmitter):
             txt = txt[0]
         if not txt:
             txt = ' '
-        txt = txt.split('/')
-        cmd = 'texttitreur'
-        cmd += ' -line1 ' + txt[0].replace(' ', '_')
-        if len(txt) > 1:
-            cmd += ' -line2 ' + txt[1].replace(' ', '_')
 
-        if not mode in self.MODES.keys():
-            mode = 'NO_SCROLL_NORMAL'
+        # All IN
+        if txt == '0' or txt == '1':
+            cmd = 'texttitreur'
+            cmd += " -alloff" if (txt=='0') else " -allon" 
 
-        cmd += ' -type ' + mode
-        cmd += ' -speed ' + str(self.speed)
-        cmd += '\n'
+        # TXT
+        else:
+            txt = txt.split('/')
+            cmd = 'texttitreur'
+            cmd += ' -line1 ' + txt[0].replace(' ', '_')
+            if len(txt) > 1:
+                cmd += ' -line2 ' + txt[1].replace(' ', '_')
+
+            if not mode in self.MODES.keys():
+                mode = 'NO_SCROLL_NORMAL'
+
+            cmd += ' -type ' + mode
+            cmd += ' -speed ' + str(self.speed)
+            cmd += '\n'
         
         if self.currentTxtCmd != cmd:
             self.currentTxtCmd = cmd
@@ -131,3 +139,20 @@ class Hardware6(EventEmitter):
     # Set text scroll speed
     def scroll(self, speed):
         self.speed = int(speed)
+
+
+    # change strip color
+    def leds(self, color, strobe=0, fade=0):
+        color = color.lstrip('#')
+        RGB = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
+        cmd = 'setlight'
+        cmd += ' -rgb ' + str(RGB[0]) +' '+ str(RGB[1]) +' '+ str(RGB[2]) 
+        if (fade > 0)       cmd += ' -fade ' + str(fade)
+        if (strobe > 0)     cmd += ' -strob ' + str(strobe)
+        cmd += '\n'
+
+        if self.currentTxtCmd != cmd:
+            self.currentTxtCmd = cmd
+            self.send(cmd)
+
+            

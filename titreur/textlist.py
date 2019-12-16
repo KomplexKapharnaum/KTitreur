@@ -25,7 +25,7 @@ class Textlist(EventEmitter):
             self.lastKey = 0
         elif len(self.texts) > 1:
             if self.random:
-                while True:
+                for rr in range(30):    # max retry
                     k = random.randrange(len(self.texts))
                     if k != self.lastKey:
                         self.lastKey = k
@@ -64,8 +64,15 @@ class Textlist(EventEmitter):
     def add(self, item):
         if not isinstance(item, tuple):
             item = (item, None)
-        self.texts.append( item )
-        self.pick( len(self.texts)-1 )
+        
+        # color ?
+        if item[0].startswith('#'):
+            self.emit('color', item[0])
+
+        # txt
+        else:
+            self.texts.append( item )
+            self.pick( len(self.texts)-1 )
 
     # remove from list
     def rm(self, item):
