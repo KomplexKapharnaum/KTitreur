@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 
 
 def on_connect(client, userdata, flags, rc):
-        print("MQTT: Connected returned result: "+connack_string(rc))
+        print("MQTT: Connected returned result: "+mqtt.connack_string(rc))
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
@@ -36,6 +36,7 @@ class Mqttinterface(EventEmitter):
         self.client = mqtt.Client(userdata=self)
         self.client.connect("2.0.0.1")
         self.client.subscribe("titreur/all/#", 2)
+        self.client.subscribe("titreur/16/#", 2)
         self.client.subscribe("titreur/"+id+"/#", 2)
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
