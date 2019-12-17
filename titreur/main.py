@@ -3,6 +3,7 @@ from hardware6 import Hardware6
 from textlist import Textlist
 from udpinterface import Udpinterface
 from mqttinterface import Mqttinterface
+from oscinterface import OscInterface
 
 # RUN
 RUN = True
@@ -43,6 +44,10 @@ mqtt.on('titre/add',       texts.add)
 mqtt.on('titre/rm',        texts.rm)
 mqtt.on('titre/text',      texts.set)
 mqtt.on('titre/tick',      texts.pick)
+
+# OSC
+osc = OscInterface(9137)
+mqtt.on('leds/dmx', hw.dmx )
 
 # STARTUP BEHAVIOUR
 texts.set( ("  BEAUCOUP ", 'NO_SCROLL_BIG') )

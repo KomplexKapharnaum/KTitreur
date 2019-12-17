@@ -15,11 +15,11 @@ def on_subscribe(client, userdata, mid, granted_qos):
     print("MQTT: subscribed", userdata, mid, granted_qos)
 
 def on_message(client, userdata, message):
-    print("MQTT: Received message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
-    command  = message.topic.split('/')[2:].join('/')
+    print("MQTT: Receivedz message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
+    command  = '/'.join(message.topic.split('/')[2:])
     args = message.payload.decode().split('§')
     userdata.emit(command, tuple(args))
-    print("--", command, tuple(args))
+    print("--", command, args)
 
 class Mqttinterface(EventEmitter):
 
