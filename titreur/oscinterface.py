@@ -2,7 +2,7 @@ from pyee import EventEmitter
 import liblo
 import socket
 
-class Oscinterface(EventEmitter):
+class OscInterface(EventEmitter):
 
     # Init object
     def __init__(self, port):
