@@ -15,7 +15,7 @@ class OscInterface(EventEmitter):
         self.server = liblo.ServerThread(port)
         self.server.add_method(None, None, self.handler)
         self.server.start()
-        print("UDP listening on", port)
+        print("OSC listening on", port)
 
     # Read UDP input
     def handler(self, path, args, types, src, userdata):
@@ -28,4 +28,5 @@ class OscInterface(EventEmitter):
 
         command = path[2:].join('/')
         self.emit(command, args)
+        print("OSC", command, args)
         
