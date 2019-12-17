@@ -19,9 +19,6 @@ class OscInterface(EventEmitter):
 
     # Read UDP input
     def handler(self, path, args, types, src, userdata):
-
-        print('OSC: ', path, args)
-
         path = path.split('/')[1:]
 
         # check destination
@@ -30,5 +27,4 @@ class OscInterface(EventEmitter):
 
         command = "/".join(path[2:])
         self.emit(command, args)
-        print("OSC", command, args)
         
