@@ -37,8 +37,12 @@ class Mqttinterface(EventEmitter):
         self.client.connect("2.0.0.1")
         self.client.subscribe("k32/all/titre/#", 2)
         self.client.subscribe("k32/c"+channel+"/titre/#", 2)
+        self.client.subscribe("k32/c16/titre/#", 2)
+
         self.client.subscribe("k32/all/leds/#", 2)
         self.client.subscribe("k32/c"+channel+"/leds/#", 2)
+        self.client.subscribe("k32/c16/leds/#", 2)
+        
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
         self.client.on_subscribe = on_subscribe
