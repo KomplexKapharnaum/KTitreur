@@ -47,7 +47,7 @@ mqtt.on('titre/tick',      texts.pick)
 
 # OSC
 osc = OscInterface(9137)
-mqtt.on('leds/dmx', hw.dmx )
+osc.on('leds/dmx', hw.dmx )
 
 # STARTUP BEHAVIOUR
 texts.set( ("  BEAUCOUP ", 'NO_SCROLL_BIG') )
