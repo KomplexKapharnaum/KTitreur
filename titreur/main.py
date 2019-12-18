@@ -19,6 +19,7 @@ RUN = hw.start()
 # TEXTLIST
 texts = Textlist()
 texts.on('pick', hw.text)
+texts.on('color', hw.leds)
 
 # RAW UDP
 UDP_PORT = 3742
@@ -45,9 +46,6 @@ mqtt.on('titre/tick',      texts.pick)
 
 # STARTUP BEHAVIOUR
 texts.set( ("  BEAUCOUP ", 'NO_SCROLL_BIG') )
-#texts.add( (" beaucoup / beaucoup", 'NO_SCROLL_NORMAL') )
-#texts.add( ("           beaucoup /     beaucoup", 'SCROLL_LOOP_NORMAL') )
-#texts.add( ("    beaucoup beaucoup", 'SCROLL_LOOP_BIG') )
 texts.autoPick(500)
 
 # LOOP

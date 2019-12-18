@@ -1,4 +1,4 @@
-
+﻿
 import random
 import curses
 import os.path
@@ -211,13 +211,14 @@ def main(win):
     curses.initscr()
     curses.cbreak()
     curses.noecho()
-    curses.resize_term(100,200)
+    curses.resize_term(130,130)
     curses.curs_set(0)
 
     for ip in DEVICES:
         TITREURS.append( Titreur(ip) )
 
-    page = 'scene'
+    showHelp = False
+    page = 'play'
     freetxt = ''
     playtxt = ''
     poscursor = 0
@@ -237,15 +238,17 @@ def main(win):
                     for t in TITREURS: t.selected = (len(sel) == 0)
                 elif key == 273: # F9
                     for t in TITREURS: t.selected = not t.selected
+                elif key == 274:  # F10
+                    showHelp = not showHelp
                 else: # F1 -> F8
                     k = key-265
                     if k < len(DEVICES):
                         for t in TITREURS:
                             if t.ip == DEVICES[k]:
                                 t.selected = not t.selected
-
+            
             # CLEARALL
-            elif key == 360 or key == 259 or key == 27: # END or ARROW UP OR ESC
+            elif key == 360 or key == 27: # END  OR ESC
                 for t in TITREURS:
                     if t.scene_val > 0: t.stop()
                     t.clear()
@@ -257,11 +260,11 @@ def main(win):
                     t.clear()
 
             # MODE SCENE
-            elif key == 339 or key == 444 or key == 560: # PAGEUP or CTRL + ARROW RIGHTa
+            elif key == 338 or key == 444 or key == 560: # PAGEDOWN or CTRL + ARROW RIGHTa
                 page = 'scene'
 
             # MODE FREETYPE
-            elif key == 262 or key == 481 or key == 525:  # HOME or CTRL + ARROW DOWN
+            elif key == 339 or key == 481 or key == 525:  # PAGEUP or CTRL + ARROW DOWN
                 page = 'free'
                 freetxt = ''
                 poscursor = 0
@@ -269,7 +272,7 @@ def main(win):
                     t.speed(0)
 
             # MODE PLAYLIST
-            elif key == 331 or key == 443 or key == 545: # INSER or CTRL + ARROW LEFT
+            elif key == 262 or key == 443 or key == 545: # HOME or CTRL + ARROW LEFT
                 page = 'play'
                 playtxt = ''
                 poscursor = 0
@@ -297,7 +300,7 @@ def main(win):
                 if t.scene_val > 0:
                     win.addstr("SCENE "+str(t.scene_val), curses.A_DIM)
                 else:
-                    win.addstr("speed "+str(t.speed_val[0])+" "+str(t.speed_val[1]), curses.A_DIM)
+                    win.addstr("[speed "+str(t.speed_val[0])+"]", curses.A_DIM)
 
                 win.addstr("\t"+(' | ').join(t.currentPL))
                 win.addstr("\n      ")
@@ -305,7 +308,12 @@ def main(win):
                 if t.scene_val > 0:
                     win.addstr(t.information, curses.A_DIM)
                 else:
-                    win.addstr("scroll "+str(t.scroll_val), curses.A_DIM)
+                    idi = t.ip.split('.')
+                    if len(idi) >= 4: idi = "id ."+idi[3] 
+                    else: idi = t.ip
+                    win.addstr("- "+idi)
+                # else:
+                #     win.addstr("scroll "+str(t.scroll_val), curses.A_DIM)
 
                 win.addstr("\n\n")
             win.addstr("\n")
@@ -330,9 +338,9 @@ def main(win):
                 cFt = freetxt
                 # BACKSPACE
                 if key == 263 or key == 127 or key == 8:
-                    # freetxt = freetxt[:-1]
-                    freetxt = freetxt[0 : poscursor-1 : ] + freetxt[poscursor : :]
-                    poscursor -= 1
+                    if poscursor > 0:
+                        freetxt = freetxt[0 : poscursor-1 : ] + freetxt[poscursor : :]
+                        poscursor -= 1
                 # CHAR
                 elif key >= 32 and key <= 168:
                     freetxt = freetxt[:poscursor] + chr(key) + freetxt[poscursor:]
@@ -367,7 +375,7 @@ def main(win):
                         win.addstr("° ")
                     else:
                         win.addstr("| ")
-                # win.addstr("\n   | | | | | | | | | | | |")
+                win.addstr("\n   1 2 3 4 5 6 7 8 9 0 1 2")
 
 
             #
@@ -378,39 +386,78 @@ def main(win):
                 # CHAR
                 # BACKSPACE
                 if key == 263 or key == 127 or key == 8:
-                    playtxt = playtxt[:-1]
-                    poscursor -= 1
+                    if poscursor > 0:
+                        playtxt = playtxt[0 : poscursor-1 : ] + playtxt[poscursor : :]
+                        poscursor -= 1
                 elif key >= 32 and key <= 168:
-                    playtxt += chr(key)
+                    playtxt = playtxt[:poscursor] + chr(key) + playtxt[poscursor:]
                     poscursor += 1
                 # ENTER = add
                 elif key == 10:
                     for t in [ti for ti in TITREURS if ti.selected]:
                         if t.scene_val > 0: t.stop()
-                        # SPEED
+                        # SCROLL SPEED
                         if playtxt.startswith('<') or playtxt.startswith('>'):
                             data = playtxt[1:]
-                            t.speed(data, data)
+                            # SCROLL
+                            if data.startswith('<') or data.startswith('>'):
+                                data = data[1:].strip().split(' ')[0]
+                                t.scroll(data)
+                            # SPEED
+                            else:
+                                data = data.strip().split(' ')[0]
+                                t.speed(data, data)
                         else: t.add(playtxt)
                     playtxt = ''
                     poscursor = 0
+                # LEFT = move cursor
+                elif key == 260:
+                    if poscursor > 0: 
+                        poscursor -= 1
+                # RIGHT = move cursor
+                elif key == 261:
+                    if poscursor < len(playtxt): 
+                        poscursor += 1
 
                 win.addstr(" MODE PLAYLIST \n", curses.A_STANDOUT)
                 win.addstr("   Enter = add text to playlist \n")
-                win.addstr("   /     = second line\n\n")
-                win.addstr("   "+" ".join(playtxt.replace("/", "\n   ")))
+                win.addstr("   /     = second line\n")
+                win.addstr("   >500  = change speed (ms)\n")
+                # win.addstr("   >> 100  = scroll speed \n")
+                win.addstr("\n   "+" ".join(playtxt.replace("/", "\n   ")))
                 win.addstr("\n   ")
                 for k in range(12):
                     if poscursor == k:
                         win.addstr("° ")
                     else:
                         win.addstr("| ")
-                # win.addstr("\n   | | | | | | | | | | | |")
+                win.addstr("\n   1 2 3 4 5 6 7 8 9 0 1 2")
 
 
             if key == -1: time.sleep(0.1)
             else: win.addstr("\n\n"+str(key))
 
+            #
+            # HELP
+            #
+            if showHelp:
+                win.addstr(" \n\n\n\n")
+                win.addstr(" CONTROLS \n", curses.A_STANDOUT)
+                win.addstr("   fn+left \t= PLAYLIST mode \n")
+                win.addstr("   fn+up \t= FREE TYPE mode \n")
+                win.addstr("   fn+down \t= SCENE FX mode \n")
+                win.addstr(" \n")
+                win.addstr("   F1-F8 \t= SELECT Device (toggle) \n")
+                win.addstr("   F9 \t\t= INVERT Selection \n")
+                win.addstr("   F12 \t\t= SELECT None / All \n")
+                win.addstr(" \n")
+                win.addstr("   esc \t\t= CLEAR All \n")
+                win.addstr("   suppr \t= CLEAR Selected \n")
+                win.addstr(" \n")
+                win.addstr("   NB: To send channel 8 to WebApp you must start K32-Bridge\n")
+            else:
+                win.addstr(" \n\n\n\n")
+                win.addstr("   press F10 to display controls ... \n")
 
             curses.doupdate()
             curses.curs_set(0)

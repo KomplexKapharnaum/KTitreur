@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 
 
 def on_connect(client, userdata, flags, rc):
-        print("MQTT: Connected returned result: "+connack_string(rc))
+        print("MQTT: Connected returned result: "+mqtt.connack_string(rc))
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
