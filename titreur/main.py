@@ -35,13 +35,13 @@ udp.on('tick',      texts.pick)
 
 # MQTT
 mqtt = Mqttinterface("2.0.0.1")
-mqtt.on('speed',     texts.autoPick )
-mqtt.on('scroll',    hw.scroll)
-mqtt.on('clear',     texts.clear)
-mqtt.on('add',       texts.add)
-mqtt.on('rm',        texts.rm)
-mqtt.on('text',      texts.set)
-mqtt.on('tick',      texts.pick)
+mqtt.on('titre/speed',     texts.autoPick )
+mqtt.on('titre/scroll',    hw.scroll)
+mqtt.on('titre/clear',     texts.clear)
+mqtt.on('titre/add',       texts.add)
+mqtt.on('titre/rm',        texts.rm)
+mqtt.on('titre/text',      texts.set)
+mqtt.on('titre/tick',      texts.pick)
 
 # STARTUP BEHAVIOUR
 texts.set( ("  BEAUCOUP ", 'NO_SCROLL_BIG') )

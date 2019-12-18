@@ -16,10 +16,10 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 def on_message(client, userdata, message):
     print("MQTT: Received message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
-    command  = message.topic.split('/')[2:]
+    command  = message.topic.split('/')[2:].join('/')
     args = message.payload.decode().split('§')
-    userdata.emit(command[0], tuple(args))
-    print("--", command[0], tuple(args))
+    userdata.emit(command, tuple(args))
+    print("--", command, tuple(args))
 
 class Mqttinterface(EventEmitter):
 
@@ -27,16 +27,18 @@ class Mqttinterface(EventEmitter):
     def __init__(self, addr):
         super().__init__()
 
-        id = '0'
+        channel = '1'
         with open('/root/id') as f:
-            id = f.read().strip()
+            channel = f.read().strip()
         
-        print('ID: ', id)
+        print('CHANNEL: ', channel)
 
         self.client = mqtt.Client(userdata=self)
         self.client.connect("2.0.0.1")
-        self.client.subscribe("titreur/all/#", 2)
-        self.client.subscribe("titreur/"+id+"/#", 2)
+        self.client.subscribe("k32/all/titre/#", 2)
+        self.client.subscribe("k32/c"+channel+"/titre/#", 2)
+        self.client.subscribe("k32/all/leds/#", 2)
+        self.client.subscribe("k32/c"+channel+"/leds/#", 2)
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
         self.client.on_subscribe = on_subscribe
