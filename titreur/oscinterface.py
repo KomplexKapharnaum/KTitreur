@@ -26,6 +26,6 @@ class Oscinterface(EventEmitter):
         if path[0] != 'k32' or (path[1] != 'all' and  path[1] != 'c'+self.channel):
             return
 
-        command = path[2:].join('/')
+        command = "/".join(path[2:])
         self.emit(command, args)
         
