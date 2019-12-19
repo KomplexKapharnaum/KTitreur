@@ -35,30 +35,35 @@ class Hardware6(EventEmitter):
     def start(self):
 
         # Start external binary
-        self.proc = Popen([self.binarypath], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        try:
+            self.proc = Popen([self.binarypath], stdout=PIPE, stdin=PIPE, stderr=PIPE)
 
-        # Wait for #INITHARDWARE
-        line = self.proc.stdout.readline().strip()
-        if line != b"#INITHARDWARE":
-            self.log.critical("Can't start hardware communication: "+str(line))
-            self.running = False
-            return False
 
-        # Send init command
-        self.log.info("Initializing hardware..")
-        self.proc.stdin.write(b'initconfig -carteVolt ? -name kxkm -titreurNbr 6 -manualmode 1\n')
-        self.proc.stdin.flush()
+            # Wait for #INITHARDWARE
+            line = self.proc.stdout.readline().strip()
+            if line != b"#INITHARDWARE":
+                self.log.critical("Can't start hardware communication: "+str(line))
+                self.running = False
+                return False
 
-        # Wait for #HARDWAREREADY
-        line = self.proc.stdout.readline().strip()
-        if line != b"#HARDWAREREADY":
-            self.log.critical("Can't init hardware: "+str(line))
-            self.running = False
-            return False
+            # Send init command
+            self.log.info("Initializing hardware..")
+            self.proc.stdin.write(b'initconfig -carteVolt ? -name kxkm -titreurNbr 6 -manualmode 1\n')
+            self.proc.stdin.flush()
 
-        # Titreur is ready
-        self.log.info("Hardware initialized")
-        self.running = True
+            # Wait for #HARDWAREREADY
+            line = self.proc.stdout.readline().strip()
+            if line != b"#HARDWAREREADY":
+                self.log.critical("Can't init hardware: "+str(line))
+                self.running = False
+                return False
+
+            # Titreur is ready
+            self.log.info("Hardware initialized")
+            self.running = True
+        except:
+            pass
+        
         return True
 
 
@@ -97,15 +102,16 @@ class Hardware6(EventEmitter):
 
     # Send CMD
     def send(self, cmd):
-        self.flush_output()
-        self.proc.stdin.write(cmd.encode('utf-8'))
-        self.proc.stdin.flush()
-        self.flush_output()
-
+        try:
+            self.flush_output()
+            self.proc.stdin.write(cmd.encode('utf-8'))
+            self.proc.stdin.flush()
+            self.flush_output()
+        except:
+            pass
 
     # Display text on Titreur
     def text(self, txt, mode=None):
-        print(txt)
         if isinstance(txt, list):
             if len(txt) > 2:
                 self.scroll(txt[2])
@@ -114,25 +120,18 @@ class Hardware6(EventEmitter):
         if not txt:
             txt = ' '
 
-        # All IN
-        if txt == '0' or txt == '1':
-            cmd = 'texttitreur'
-            cmd += " -alloff" if (txt=='0') else " -allon" 
+        txt = txt.split('/')
+        cmd = 'texttitreur'
+        cmd += ' -line1 ' + txt[0].replace(' ', '_')
+        if len(txt) > 1:
+            cmd += ' -line2 ' + txt[1].replace(' ', '_')
 
-        # TXT
-        else:
-            txt = txt.split('/')
-            cmd = 'texttitreur'
-            cmd += ' -line1 ' + txt[0].replace(' ', '_')
-            if len(txt) > 1:
-                cmd += ' -line2 ' + txt[1].replace(' ', '_')
+        if not mode in self.MODES.keys():
+            mode = 'NO_SCROLL_NORMAL'
 
-            if not mode in self.MODES.keys():
-                mode = 'NO_SCROLL_NORMAL'
-
-            cmd += ' -type ' + mode
-            cmd += ' -speed ' + str(self.speed)
-            cmd += '\n'
+        cmd += ' -type ' + mode
+        cmd += ' -speed ' + str(self.speed)
+        cmd += '\n'
         
         if self.currentTxtCmd != cmd:
             self.currentTxtCmd = cmd
@@ -159,12 +158,15 @@ class Hardware6(EventEmitter):
             self.send(cmd)
 
     def dmx(self, values):
-        RGB = values[1:4]
+
+        RGB = [values[1], values[2], values[3]]
+        print(RGB)
         MASTER = values[0]
+        print(MASTER)
         RGB[0] = (RGB[0]*MASTER)/255
         RGB[1] = (RGB[1]*MASTER)/255
         RGB[2] = (RGB[2]*MASTER)/255
-        # print("DMX", RGB)
+        print("DMX", RGB)
         cmd = 'setlight'
         cmd += ' -rgb ' + str(RGB[0]) +' '+ str(RGB[1]) +' '+ str(RGB[2]) 
         cmd += '\n'

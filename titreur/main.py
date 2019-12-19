@@ -8,6 +8,12 @@ from oscinterface import OscInterface
 # RUN
 RUN = True
 
+if len(sys.argv) < 2:
+        print('no broker specified, default to 2.0.0.1')
+        brokerIP = "2.0.0.1"
+else : 
+        brokerIP = sys.argv[1]
+
 def signal_handler(signal, frame):
     global RUN
     RUN = False
@@ -24,8 +30,6 @@ texts.on('color', hw.leds)
 
 # RAW UDP
 UDP_PORT = 3742
-if len(sys.argv) >= 2:
-    UDP_PORT = int(sys.argv[1])
 udp = Udpinterface(UDP_PORT)
 udp.on('speed',     texts.autoPick )
 udp.on('scroll',    hw.scroll)
@@ -36,7 +40,7 @@ udp.on('text',      texts.set)
 udp.on('tick',      texts.pick)
 
 # MQTT
-mqtt = Mqttinterface("2.0.0.1")
+mqtt = Mqttinterface(brokerIP)
 mqtt.on('titre/speed',     texts.autoPick )
 mqtt.on('titre/scroll',    hw.scroll)
 mqtt.on('titre/clear',     texts.clear) 

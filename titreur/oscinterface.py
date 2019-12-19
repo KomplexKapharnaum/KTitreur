@@ -9,9 +9,12 @@ class OscInterface(EventEmitter):
         super().__init__()
 
         self.channel = '1'
-        with open('/root/id') as f:
-            self.channel = f.read().strip()
-
+        try:
+            with open('/root/id') as f:
+                self.channel = f.read().strip()
+        except:
+            pass
+        
         self.server = liblo.ServerThread(port)
         self.server.add_method(None, None, self.handler)
         self.server.start()

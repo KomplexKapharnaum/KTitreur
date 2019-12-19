@@ -33,13 +33,16 @@ class Mqttinterface(EventEmitter):
         super().__init__()
 
         channel = '1'
-        with open('/root/id') as f:
-            channel = f.read().strip()
-        
+        try:
+            with open('/root/id') as f:
+                channel = f.read().strip()
+        except:
+            pass
+
         print('CHANNEL: ', channel)
 
         self.client = mqtt.Client(userdata=self)
-        self.client.connect("2.0.0.1")
+        self.client.connect(addr)
         self.client.subscribe("k32/all/titre/#", 2)
         self.client.subscribe("k32/c"+channel+"/titre/#", 2)
         self.client.subscribe("k32/c16/titre/#", 2)

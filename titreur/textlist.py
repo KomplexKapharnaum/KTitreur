@@ -63,7 +63,7 @@ class Textlist(EventEmitter):
     # Add to list // item should be a tuple (text, scroll_mode)
     def add(self, item):
         if not isinstance(item, list):
-            item = [item, None]
+            item = [item, None, 1]
         
         # color ?
         print(item)
@@ -88,12 +88,10 @@ class Textlist(EventEmitter):
                 p = self.pick()
 
     # set entire list
-    def set(self, lst):
-        lst = [lst]
+    def set(self, item):
         self.clear(False)
-        for item in lst:
-            self.add(item)
-        p = self.pick()
+        self.add(item)
+        # p = self.pick()
         # print("show ", p)
 
 
