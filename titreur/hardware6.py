@@ -160,13 +160,11 @@ class Hardware6(EventEmitter):
     def dmx(self, values):
 
         RGB = [values[1], values[2], values[3]]
-        print(RGB)
         MASTER = values[0]
-        print(MASTER)
-        RGB[0] = (RGB[0]*MASTER)/255
-        RGB[1] = (RGB[1]*MASTER)/255
-        RGB[2] = (RGB[2]*MASTER)/255
-        print("DMX", RGB)
+        RGB[0] = int((RGB[0]*MASTER)/255)
+        RGB[1] = int((RGB[1]*MASTER)/255)
+        RGB[2] = int((RGB[2]*MASTER)/255)
+        print("DMX", MASTER, RGB)
         cmd = 'setlight'
         cmd += ' -rgb ' + str(RGB[0]) +' '+ str(RGB[1]) +' '+ str(RGB[2]) 
         cmd += '\n'
