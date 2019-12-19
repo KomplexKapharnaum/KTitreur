@@ -17,7 +17,12 @@ def on_subscribe(client, userdata, mid, granted_qos):
 def on_message(client, userdata, message):
     print("MQTT: Receivedz message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
     command  = '/'.join(message.topic.split('/')[2:])
-    args = message.payload.decode().split('§')
+    if command.startswith('titre'):
+        args = message.payload.decode().split('§')
+    elif command.startswith('leds'):
+        args = message.payload
+    else:
+        args = message.payload
     userdata.emit(command, args)
     print("--", command, args)
 
