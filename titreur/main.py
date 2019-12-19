@@ -39,7 +39,7 @@ udp.on('tick',      texts.pick)
 mqtt = Mqttinterface("2.0.0.1")
 mqtt.on('titre/speed',     texts.autoPick )
 mqtt.on('titre/scroll',    hw.scroll)
-mqtt.on('titre/clear',     texts.clear)
+mqtt.on('titre/clear',     texts.clear) 
 mqtt.on('titre/add',       texts.add)
 mqtt.on('titre/rm',        texts.rm)
 mqtt.on('titre/text',      texts.set)
@@ -49,8 +49,8 @@ mqtt.on('titre/tick',      texts.pick)
 osc = OscInterface(9137)
 osc.on('leds/dmx', hw.dmx )
 
-# STARTUP BEHAVIOUR
-texts.set( ("  BEAUCOUP ", 'NO_SCROLL_BIG') )
+# STARTUP BEHAVIOUR 
+texts.set( ["  BEAUCOUPBEAUCOUPBEAUCOUP ", 'SCROLL_BIG', 127] )
 texts.autoPick(500)
 
 # LOOP
