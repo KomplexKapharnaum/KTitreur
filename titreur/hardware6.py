@@ -164,7 +164,7 @@ class Hardware6(EventEmitter):
         RGB[0] = (RGB[0]*MASTER)/255
         RGB[1] = (RGB[1]*MASTER)/255
         RGB[2] = (RGB[2]*MASTER)/255
-        # print("DMX", RGB)
+        print("DMX", MASTER, RGB)
         cmd = 'setlight'
         cmd += ' -rgb ' + str(RGB[0]) +' '+ str(RGB[1]) +' '+ str(RGB[2]) 
         cmd += '\n'
