@@ -2,7 +2,7 @@ from pyee import EventEmitter
 import liblo
 import socket
 
-class Oscinterface(EventEmitter):
+class OscInterface(EventEmitter):
 
     # Init object
     def __init__(self, port):
@@ -15,11 +15,10 @@ class Oscinterface(EventEmitter):
         self.server = liblo.ServerThread(port)
         self.server.add_method(None, None, self.handler)
         self.server.start()
-        print("UDP listening on", port)
+        print("OSC listening on", port)
 
     # Read UDP input
     def handler(self, path, args, types, src, userdata):
-
         path = path.split('/')[1:]
 
         # check destination
