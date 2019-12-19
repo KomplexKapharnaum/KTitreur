@@ -44,7 +44,7 @@ mqtt.on('titre/add',       texts.add)
 mqtt.on('titre/rm',        texts.rm)
 mqtt.on('titre/text',      texts.set)
 mqtt.on('titre/tick',      texts.pick)
-mqtt.on('leds/dmx',        hw.dmx)
+mqtt.on('leds/dmx',         hw.dmx)
 
 # OSC
 osc = OscInterface(9137)
