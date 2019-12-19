@@ -62,10 +62,11 @@ class Textlist(EventEmitter):
 
     # Add to list // item should be a tuple (text, scroll_mode)
     def add(self, item):
-        if not isinstance(item, tuple):
-            item = (item, None)
+        if not isinstance(item, list):
+            item = [item, None]
         
         # color ?
+        print(item)
         if item[0].startswith('#'):
             self.emit('color', item[0])
 
@@ -76,8 +77,8 @@ class Textlist(EventEmitter):
 
     # remove from list
     def rm(self, item):
-        if not isinstance(item, tuple):
-            item = (item, None)
+        if not isinstance(item, list):
+            item = [item, None]
 
         if item in self.texts:
             repick = self.texts[self.lastKey] == item
@@ -88,8 +89,7 @@ class Textlist(EventEmitter):
 
     # set entire list
     def set(self, lst):
-        if not isinstance(lst, list):
-            lst = [lst]
+        lst = [lst]
         self.clear(False)
         for item in lst:
             self.add(item)

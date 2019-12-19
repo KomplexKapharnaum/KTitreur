@@ -18,7 +18,7 @@ def on_message(client, userdata, message):
     print("MQTT: Receivedz message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
     command  = '/'.join(message.topic.split('/')[2:])
     args = message.payload.decode().split('§')
-    userdata.emit(command, tuple(args))
+    userdata.emit(command, args)
     print("--", command, args)
 
 class Mqttinterface(EventEmitter):

@@ -105,9 +105,12 @@ class Hardware6(EventEmitter):
 
     # Display text on Titreur
     def text(self, txt, mode=None):
-        if isinstance(txt, tuple):
+        print(txt)
+        if isinstance(txt, list):
+            if len(txt) > 2:
+                self.scroll(txt[2])
             mode = txt[1]
-            txt = txt[0]
+            txt = txt[0] 
         if not txt:
             txt = ' '
 
@@ -134,11 +137,11 @@ class Hardware6(EventEmitter):
         if self.currentTxtCmd != cmd:
             self.currentTxtCmd = cmd
             self.send(cmd)
-
+            print(cmd)
 
     # Set text scroll speed
     def scroll(self, speed):
-        self.speed = int(speed)
+        self.speed = 128-int(speed)
 
 
     # change strip color
