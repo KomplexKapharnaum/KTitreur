@@ -36,3 +36,7 @@ Séparer dans le mode Freetype le scroll et le texte fixe en 2 modes distincts.
 - Playlist items are rotated randomly with delay called speed in milliseconds
 - Send `>1000` to change text rotation speed to i.e. 1000ms
 
+
+
+FIX 50:
+kxkm_fs_root_rw && nano /etc/locale.gen && date -s 20200109 && locale-gen && localectl set-locale LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8 && export LANGUAGE=en_US.UTF-8 && cd KTitreur/ && git stash && git pull && reboot

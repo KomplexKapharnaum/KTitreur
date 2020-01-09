@@ -120,7 +120,7 @@ class Hardware6(EventEmitter):
         if not txt:
             txt = ' '
 
-        txt = txt.split('/')
+        txt = txt.split(';')
         cmd = 'texttitreur'
         cmd += ' -line1 ' + txt[0].replace(' ', '_')
         if len(txt) > 1:
