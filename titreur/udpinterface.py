@@ -55,6 +55,10 @@ class Udpinterface(EventEmitter):
             # tick
             elif data[0] == "tick":
             	self.emit('tick')
+             
+            # leds
+            elif data[0] == "leds":
+            	self.emit('leds', data)
 
 
         except socket.timeout:

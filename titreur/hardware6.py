@@ -115,7 +115,8 @@ class Hardware6(EventEmitter):
         if isinstance(txt, list):
             if len(txt) > 2:
                 self.scroll(txt[2])
-            mode = txt[1]
+            if len(txt) > 1:
+                mode = txt[1]
             txt = txt[0] 
         if not txt:
             txt = ' '
@@ -127,7 +128,10 @@ class Hardware6(EventEmitter):
             cmd += ' -line2 ' + txt[1].replace(' ', '_')
 
         if not mode in self.MODES.keys():
-            mode = 'NO_SCROLL_NORMAL'
+            if len(txt) > 1:
+                mode = 'NO_SCROLL_NORMAL'
+            else:
+                mode = 'NO_SCROLL_BIG'
 
         cmd += ' -type ' + mode
         cmd += ' -speed ' + str(self.speed)
