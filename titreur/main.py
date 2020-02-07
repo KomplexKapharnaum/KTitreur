@@ -3,9 +3,16 @@ from hardware6 import Hardware6
 from textlist import Textlist
 from udpinterface import Udpinterface
 from mqttinterface import Mqttinterface
+from oscinterface import OscInterface
 
 # RUN
 RUN = True
+
+if len(sys.argv) < 2:
+        print('no broker specified, default to 2.0.0.1')
+        brokerIP = "2.0.0.1"
+else : 
+        brokerIP = sys.argv[1]
 
 def signal_handler(signal, frame):
     global RUN
@@ -19,11 +26,10 @@ RUN = hw.start()
 # TEXTLIST
 texts = Textlist()
 texts.on('pick', hw.text)
+texts.on('color', hw.leds)
 
 # RAW UDP
 UDP_PORT = 3742
-if len(sys.argv) >= 2:
-    UDP_PORT = int(sys.argv[1])
 udp = Udpinterface(UDP_PORT)
 udp.on('speed',     texts.autoPick )
 udp.on('scroll',    hw.scroll)
@@ -34,20 +40,22 @@ udp.on('text',      texts.set)
 udp.on('tick',      texts.pick)
 
 # MQTT
-mqtt = Mqttinterface("2.0.0.1")
-mqtt.on('speed',     texts.autoPick )
-mqtt.on('scroll',    hw.scroll)
-mqtt.on('clear',     texts.clear)
-mqtt.on('add',       texts.add)
-mqtt.on('rm',        texts.rm)
-mqtt.on('text',      texts.set)
-mqtt.on('tick',      texts.pick)
+mqtt = Mqttinterface(brokerIP)
+mqtt.on('titre/speed',     texts.autoPick )
+mqtt.on('titre/scroll',    hw.scroll)
+mqtt.on('titre/clear',     texts.clear) 
+mqtt.on('titre/add',       texts.add)
+mqtt.on('titre/rm',        texts.rm)
+mqtt.on('titre/text',      texts.set)
+mqtt.on('titre/tick',      texts.pick)
+mqtt.on('leds/dmx',         hw.dmx)
 
-# STARTUP BEHAVIOUR
-texts.set( ("  BEAUCOUP ", 'NO_SCROLL_BIG') )
-#texts.add( (" beaucoup / beaucoup", 'NO_SCROLL_NORMAL') )
-#texts.add( ("           beaucoup /     beaucoup", 'SCROLL_LOOP_NORMAL') )
-#texts.add( ("    beaucoup beaucoup", 'SCROLL_LOOP_BIG') )
+# OSC
+osc = OscInterface(9137)
+osc.on('leds/dmx', hw.dmx )
+
+# STARTUP BEHAVIOUR 
+texts.set( ["  BEAUCOUPBEAUCOUPBEAUCOUP ", 'SCROLL_BIG', 127] )
 texts.autoPick(500)
 
 # LOOP

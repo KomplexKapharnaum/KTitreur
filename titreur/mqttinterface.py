@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 
 
 def on_connect(client, userdata, flags, rc):
-        print("MQTT: Connected returned result: "+connack_string(rc))
+        print("MQTT: Connected returned result: "+mqtt.connack_string(rc))
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
@@ -15,11 +15,16 @@ def on_subscribe(client, userdata, mid, granted_qos):
     print("MQTT: subscribed", userdata, mid, granted_qos)
 
 def on_message(client, userdata, message):
-    print("MQTT: Received message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
-    command  = message.topic.split('/')[2:]
-    args = message.payload.decode().split('§')
-    userdata.emit(command[0], tuple(args))
-    print("--", command[0], tuple(args))
+    print("MQTT: Receivedz message '" + str(message.payload) + "' on topic '" + message.topic + "' with QoS " + str(message.qos))
+    command  = '/'.join(message.topic.split('/')[2:])
+    # print('--comand', command)
+    args = None
+    if command.startswith('titre'):
+        args = message.payload.decode().split('§')
+    elif command.startswith('leds'):
+        args = list(message.payload)
+    userdata.emit(command, args)
+    # print("--", command, args)
 
 class Mqttinterface(EventEmitter):
 
@@ -27,16 +32,25 @@ class Mqttinterface(EventEmitter):
     def __init__(self, addr):
         super().__init__()
 
-        id = '0'
-        with open('/root/id') as f:
-            id = f.read().strip()
-        
-        print('ID: ', id)
+        channel = '1'
+        try:
+            with open('/root/id') as f:
+                channel = f.read().strip()
+        except:
+            pass
+
+        print('CHANNEL: ', channel)
 
         self.client = mqtt.Client(userdata=self)
-        self.client.connect("2.0.0.1")
-        self.client.subscribe("titreur/all/#", 2)
-        self.client.subscribe("titreur/"+id+"/#", 2)
+        self.client.connect(addr)
+        self.client.subscribe("k32/all/titre/#", 2)
+        self.client.subscribe("k32/c"+channel+"/titre/#", 2)
+        self.client.subscribe("k32/c16/titre/#", 2)
+
+        self.client.subscribe("k32/all/leds/#", 2)
+        self.client.subscribe("k32/c"+channel+"/leds/#", 2)
+        self.client.subscribe("k32/c16/leds/#", 2)
+        
         self.client.on_connect = on_connect
         self.client.on_disconnect = on_disconnect
         self.client.on_subscribe = on_subscribe

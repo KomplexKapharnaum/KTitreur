@@ -25,7 +25,7 @@ class Textlist(EventEmitter):
             self.lastKey = 0
         elif len(self.texts) > 1:
             if self.random:
-                while True:
+                for rr in range(30):    # max retry
                     k = random.randrange(len(self.texts))
                     if k != self.lastKey:
                         self.lastKey = k
@@ -62,15 +62,23 @@ class Textlist(EventEmitter):
 
     # Add to list // item should be a tuple (text, scroll_mode)
     def add(self, item):
-        if not isinstance(item, tuple):
-            item = (item, None)
-        self.texts.append( item )
-        self.pick( len(self.texts)-1 )
+        if not isinstance(item, list):
+            item = [item, None, 1]
+        
+        # color ?
+        print(item)
+        if item[0].startswith('#'):
+            self.emit('color', item[0])
+
+        # txt
+        else:
+            self.texts.append( item )
+            self.pick( len(self.texts)-1 )
 
     # remove from list
     def rm(self, item):
-        if not isinstance(item, tuple):
-            item = (item, None)
+        if not isinstance(item, list):
+            item = [item, None]
 
         if item in self.texts:
             repick = self.texts[self.lastKey] == item
@@ -80,13 +88,10 @@ class Textlist(EventEmitter):
                 p = self.pick()
 
     # set entire list
-    def set(self, lst):
-        if not isinstance(lst, list):
-            lst = [lst]
+    def set(self, item):
         self.clear(False)
-        for item in lst:
-            self.add(item)
-        p = self.pick()
+        self.add(item)
+        # p = self.pick()
         # print("show ", p)
 
 
