@@ -9,12 +9,12 @@ import subprocess
 import paho.mqtt.client as mqtt
 
 
-BROADCAST = '2.0.255.255'
-DEVICES = ['2.0.11.44', '2.0.11.45', '2.0.11.48', '2.0.11.50', '2.0.11.51', '2.0.11.52', '2.0.11.54', 'webapp']
+BROADCAST = '10.0.255.255'
+DEVICES = ['10.0.11.44', '10.0.11.45', '10.0.11.48', '10.0.11.50', '10.0.11.51', '10.0.11.52', '10.0.11.54', 'webapp']
 TITREURS = []
 PORT = 3742
 CONSOLE = []
-BROKER = '2.0.0.1'
+BROKER = '10.0.0.1'
 
 mqttc = mqtt.Client()
 mqttc.connect(BROKER)
