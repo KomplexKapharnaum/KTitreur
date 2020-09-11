@@ -60,7 +60,7 @@ class Titreur():
             dest = 'webapp'
         else:
             dest = str(self.id)
-        mqttc.publish('titreur/'+dest+'/'+cmds[0], payload=txt, qos=1, retain=False)
+        mqttc.publish('k32/c'+dest+'/titre/'+cmds[0], payload=txt, qos=1, retain=False)
 
     def clear(self):
         self.currentPL = []
