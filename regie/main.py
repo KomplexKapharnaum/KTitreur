@@ -55,7 +55,7 @@ class Titreur():
         args = cmds[1:]
         if cmds[0] == 'add' or cmds[0] == 'text':
             args = reversed(args)
-        txt = "§".join(args)
+        txt = "|".join(args)
         if self.ip == 'webapp':
             dest = 'webapp'
         else:
@@ -284,7 +284,7 @@ def main(win):
             # DISPLAY
             #
             win.clear()
-            win.addstr("\n BEAUCOUP BEAUCOUP \n\n", curses.A_STANDOUT)
+            win.addstr("\n REGIE TITREURS \n\n", curses.A_STANDOUT)
 
 
             #
