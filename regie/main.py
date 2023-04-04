@@ -10,7 +10,7 @@ import paho.mqtt.client as mqtt
 
 
 BROADCAST = '10.0.255.255'
-DEVICES = ['10.0.11.44', '10.0.11.45', '10.0.11.48', '10.0.11.50', '10.0.11.51', '10.0.11.52', '10.0.11.54', 'webapp']
+DEVICES = ['10.0.11.1', '10.0.11.2', '10.0.11.3', '10.0.11.4', '10.0.11.5', '10.0.11.6', '10.0.11.7', 'webapp']
 TITREURS = []
 PORT = 3742
 CONSOLE = []
@@ -60,7 +60,7 @@ class Titreur():
             dest = 'webapp'
         else:
             dest = str(self.id)
-        mqttc.publish('k32/c'+dest+'/titre/'+cmds[0], payload=txt, qos=1, retain=False)
+        mqttc.publish('titreur/c'+dest+'/'+cmds[0], payload=txt, qos=1, retain=False)
 
     def clear(self):
         self.currentPL = []
